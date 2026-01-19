@@ -52,9 +52,6 @@ make uninstall
 - GCC 编译器
 - POSIX 兼容系统（Linux/macOS）
 
-## 作者
-
-微软MVP学习社区
 
 ## 许可证
 

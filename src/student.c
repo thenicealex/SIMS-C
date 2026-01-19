@@ -13,36 +13,138 @@
 #define SET_CONSOLE_COLOR(color) system(color)
 #endif
 
-struct Node *List = NULL;
+static struct Node *List = NULL;
 
-void menu();
-void function();
-void login();
-void login_Second();
-void rebackPassword();
-void addStudent(struct student tempData);
-void searchStudent(struct student tempData);
-void modifyStudent(struct student tempData);
-void modifyStudent_Second(struct student tempData);
-void deleteStudent(struct student tempData);
-void sortStudent();
+static void clear_input_buffer(void)
+{
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+}
 
-int main()
+static int read_line(char *buffer, size_t size)
+{
+    if (buffer == NULL || size == 0) {
+        return 0;
+    }
+
+    if (fgets(buffer, size, stdin) == NULL) {
+        return 0;
+    }
+
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len - 1] == '\n') {
+        buffer[len - 1] = '\0';
+    }
+
+    return 1;
+}
+
+static void read_string(const char *prompt, char *buffer, size_t size)
+{
+    if (buffer == NULL || size == 0) {
+        return;
+    }
+
+    printf("\t\t\t\t%s:", prompt);
+    buffer[0] = '\0';
+
+    while (buffer[0] == '\0') {
+        if (!read_line(buffer, size)) {
+            clear_input_buffer();
+            printf("\t\t\t\tInvalid input. Please try again: ");
+        }
+    }
+}
+
+static int read_int(const char *prompt, int min, int max)
+{
+    int value;
+    int result;
+
+    printf("\t\t\t\t%s:", prompt);
+
+    while (1) {
+        result = scanf("%d", &value);
+        clear_input_buffer();
+
+        if (result != 1) {
+            printf("\t\t\t\tInvalid input. Please enter a number: ");
+            continue;
+        }
+
+        if (value < min || value > max) {
+            printf("\t\t\t\tPlease enter a number between %d and %d: ", min, max);
+            continue;
+        }
+
+        return value;
+    }
+}
+
+static float read_float(const char *prompt, float min, float max)
+{
+    float value;
+    int result;
+
+    printf("\t\t\t\t%s:", prompt);
+
+    while (1) {
+        result = scanf("%f", &value);
+        clear_input_buffer();
+
+        if (result != 1) {
+            printf("\t\t\t\tInvalid input. Please enter a number: ");
+            continue;
+        }
+
+        if (value < min || value > max) {
+            printf("\t\t\t\tPlease enter a number between %.1f and %.1f: ", min, max);
+            continue;
+        }
+
+        return value;
+    }
+}
+
+static void menu();
+static void function();
+static void login();
+static void login_Second();
+static void rebackPassword();
+static void addStudent(void);
+static void searchStudent(void);
+static void modifyStudent(void);
+static void modifyStudent_Second(const char *id);
+static void deleteStudent(void);
+static void sortStudent(void);
+
+int main(void)
 {
     SET_CONSOLE_TITLE("Student Information Management System");
     SET_CONSOLE_COLOR("color F0");
     system("mode con cols=90 lines=30");
 
     List = creatList();
+    if (List == NULL) {
+        fprintf(stderr, "Failed to create list. Exiting.\n");
+        return 1;
+    }
 
-    readFromFile("student.txt", List);
+    int lines = readFromFile("student.txt", List);
+    if (lines < 0) {
+        printf("\t\t\t\tWarning: Could not load data file.\n");
+    }
 
     menu();
+
+    saveToFile("student.txt", List);
+    freeList(List);
+    List = NULL;
 
     return 0;
 }
 
-void menu()
+static void menu(void)
 {
     printf("\t\t\t----------------------------------------\n");
     printf("\t\t\t|\tWelcome to Student Management System\t|\n");
@@ -51,13 +153,8 @@ void menu()
     printf("\t\t\t|\t2. Forgot Password\t\t|\n");
     printf("\t\t\t|\t3. Exit System\t\t\t|\n");
     printf("\t\t\t----------------------------------------\n");
-    printf("\t\t\tPlease select (1-3) (press Enter to confirm):");
 
-    int choice = 0;
-    scanf("%d", &choice);
-
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    int choice = read_int("Please select (1-3)", 1, 3);
 
     switch (choice)
     {
@@ -83,36 +180,37 @@ void menu()
             printf("\n\t\t\tInvalid input! Please try again.\n\t\t\t");
             system("pause");
             system("cls");
-
             menu();
             break;
         }
     }
 }
 
-void login()
+static void login(void)
 {
-    int i = 0;
+    int i;
     char Password[] = "123";
-    char tempPass[10] = "0";
+    char tempPass[MAX_INPUT_LEN] = {0};
 
     printf("\t\t\t---------------Login System---------------\n\n");
     printf("\t\t\t\tAdmin Account: admin\n");
     for (i = 1; i <= 3; i++)
     {
         printf("\t\t\t\tAdmin Password:");
-        scanf("%s", tempPass);
 
-        char ch;
-        while ((ch = getchar()) != '\n' && ch != EOF);
+        if (!read_line(tempPass, sizeof(tempPass))) {
+            clear_input_buffer();
+            tempPass[0] = '\0';
+        }
 
-        if (!strcmp(Password, tempPass))
+        if (strcmp(Password, tempPass) == 0)
         {
             printf("\n\t\t\t\tLogin successful!");
             printf("\n\t\t\t\t");
             system("pause");
             system("cls");
             function();
+            return;
         }
         else
         {
@@ -135,7 +233,7 @@ void login()
     }
 }
 
-void login_Second()
+static void login_Second(void)
 {
     printf("\t\t\t-------------------------------------\n");
     printf("\t\t\t|\t    1. Forgot Password\t\t    |\n");
@@ -144,11 +242,7 @@ void login_Second()
     printf("\t\t\t-------------------------------------\n");
     printf("\t\t\t\t   Please select (1-3):");
 
-    int choice = 0;
-    scanf("%d", &choice);
-
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    int choice = read_int("Please select", 1, 3);
 
     switch (choice)
     {
@@ -174,39 +268,32 @@ void login_Second()
             printf("\n\t\t\t\tInvalid input! Please try again.\n\t\t\t\t");
             system("pause");
             system("cls");
-
             login_Second();
             break;
         }
     }
 }
 
-void rebackPassword()
+static void rebackPassword(void)
 {
-    int question_one = 0;
-    int question_two = 0;
-    int question_three = 0;
+    int question_one, question_two, question_three;
 
     printf("\t\t\t    ------------Forgot Password------------\n\n");
     printf("\t\t\t\t    Security Questions:\n");
     printf("\n\t\t\t\t    1. What is your pet's name?\n");
     printf("\n\t\t\t\t      Answer:");
 
-    scanf("%d", &question_one);
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    question_one = read_int("Answer", 1, 100);
 
     printf("\n\t\t\t\t    2. What is your favorite color?\n");
     printf("\n\t\t\t\t      Answer:");
 
-    scanf("%d", &question_two);
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    question_two = read_int("Answer", 1, 100);
 
     printf("\n\t\t\t\t    3. What is your favorite food?\n");
     printf("\n\t\t\t\t      Answer:");
 
-    scanf("%d", &question_three);
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    question_three = read_int("Answer", 1, 100);
 
     if (1 == question_one && 2 == question_two && 3 == question_three)
     {
@@ -223,7 +310,7 @@ void rebackPassword()
     menu();
 }
 
-void function()
+static void function(void)
 {
     printf("\t\t\t-----------------------------------------\n");
     printf("\t\t\t|\tWelcome to Student Management System\t|\n");
@@ -239,19 +326,13 @@ void function()
     printf("\t\t\t-----------------------------------------\n");
     printf("\t\t\tPlease select (1-8):");
 
-    struct student tempData = {"0", "0", "0", 0, 0.0, 0.0, 0.0};
-
-    int choice = 0;
-    scanf("%d", &choice);
-
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    int choice = read_int("Please select", 1, 8);
 
     switch (choice)
     {
     case 1:
         {
-            addStudent(tempData);
+            addStudent();
             printf("\n\t\t\t\t");
             system("pause");
             system("cls");
@@ -268,7 +349,7 @@ void function()
         }
     case 3:
         {
-            searchStudent(tempData);
+            searchStudent();
             printf("\n\t\t\t\t");
             system("pause");
             system("cls");
@@ -276,7 +357,7 @@ void function()
         }
     case 4:
         {
-            modifyStudent(tempData);
+            modifyStudent();
             printf("\n\t\t\t\t");
             system("pause");
             system("cls");
@@ -284,7 +365,7 @@ void function()
         }
     case 5:
         {
-            deleteStudent(tempData);
+            deleteStudent();
             printf("\n\t\t\t\t");
             system("pause");
             system("cls");
@@ -321,33 +402,19 @@ void function()
     function();
 }
 
-void addStudent(struct student tempData)
+static void addStudent(void)
 {
+    struct student tempData;
+
     printf("\n\t\t\t--------------Add Student--------------\n");
-    printf("\t\t\t\tStudent ID:");
-    scanf("%s", tempData.id);
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
 
-    printf("\t\t\t\tName:");
-    scanf("%s", tempData.name);
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    read_string("Student ID", tempData.id, sizeof(tempData.id));
+    read_string("Name", tempData.name, sizeof(tempData.name));
+    read_string("Gender", tempData.gender, sizeof(tempData.gender));
 
-    printf("\t\t\t\tGender:");
-    scanf("%s", tempData.gender);
-    while ((ch = getchar()) != '\n' && ch != EOF);
-
-    printf("\t\t\t\tAge:");
-    scanf("%d", &tempData.age);
-    while ((ch = getchar()) != '\n' && ch != EOF);
-
-    printf("\t\t\t\tMath Score:");
-    scanf("%f", &tempData.math);
-    while ((ch = getchar()) != '\n' && ch != EOF);
-
-    printf("\t\t\t\tEnglish Score:");
-    scanf("%f", &tempData.english);
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    tempData.age = read_int("Age", 1, 150);
+    tempData.math = read_float("Math Score (0-100)", 0.0f, 100.0f);
+    tempData.english = read_float("English Score (0-100)", 0.0f, 100.0f);
 
     tempData.sumscore = tempData.math + tempData.english;
     printf("\t\t\t\tTotal Score: %.1f\n", tempData.sumscore);
@@ -357,50 +424,48 @@ void addStudent(struct student tempData)
     printf("\n\t\t\t\tAdd successful!\n");
 }
 
-void searchStudent(struct student tempData)
+static void searchStudent(void)
 {
     printf("\n\t\t\t---------------Search Student--------------\n\n");
     printf("\t\t\t\t1. Search by ID\t\t\t\n");
     printf("\t\t\t\t2. Search by Name\t\t\t\n");
     printf("\t\t\t\tPlease select:");
 
-    int choice = 0;
-    scanf("%d", &choice);
-
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    int choice = read_int("Please select", 1, 2);
 
     switch (choice)
     {
     case 1:
         {
+            char id[ID_LEN];
             printf("\n\t\t\tEnter the student ID to search:");
-            scanf("%s", tempData.id);
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            read_string("Student ID", id, sizeof(id));
 
-            if (searchnode_byid(List, tempData.id) == NULL)
+            struct Node *result = searchnode_byid(List, id);
+            if (result == NULL)
             {
                 printf("\n\t\t\t\tStudent not found!\n");
             }
             else
             {
-                printsearch(searchnode_byid(List, tempData.id));
+                printsearch(result);
             }
             break;
         }
     case 2:
         {
+            char name[NAME_LEN];
             printf("\n\t\t\tEnter the student name to search:");
-            scanf("%s", tempData.name);
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            read_string("Student Name", name, sizeof(name));
 
-            if (searchnode_byname(List, tempData.name) == NULL)
+            struct Node *result = searchnode_byname(List, name);
+            if (result == NULL)
             {
                 printf("\n\t\t\t\tStudent not found!\n");
             }
             else
             {
-                printsearch(searchnode_byname(List, tempData.name));
+                printsearch(result);
             }
             break;
         }
@@ -412,7 +477,7 @@ void searchStudent(struct student tempData)
     }
 }
 
-void modifyStudent(struct student tempData)
+static void modifyStudent(void)
 {
     printf("\n\t\t\t--------Modify Student Info--------\t\t\t\t\n");
     printList(List);
@@ -420,43 +485,41 @@ void modifyStudent(struct student tempData)
     printf("\t\t\t\t2. Modify by Name\t\t\t\t\n");
     printf("\t\t\t\tPlease select:");
 
-    int choice = 0;
-    scanf("%d", &choice);
-
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    int choice = read_int("Please select", 1, 2);
 
     switch (choice)
     {
     case 1:
         {
+            char id[ID_LEN];
             printf("\n\t\t\tEnter the student ID to modify:");
-            scanf("%s", tempData.id);
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            read_string("Student ID", id, sizeof(id));
 
-            if (searchnode_byid(List, tempData.id) == NULL)
+            struct Node *result = searchnode_byid(List, id);
+            if (result == NULL)
             {
                 printf("\n\t\t\t\tStudent not found!\n");
             }
             else
             {
-                modifyStudent_Second(tempData);
+                modifyStudent_Second(id);
             }
             break;
         }
     case 2:
         {
+            char name[NAME_LEN];
             printf("\n\t\t\t\tEnter the student name to modify:");
-            scanf("%s", tempData.name);
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            read_string("Student Name", name, sizeof(name));
 
-            if (searchnode_byname(List, tempData.name) == NULL)
+            struct Node *result = searchnode_byname(List, name);
+            if (result == NULL)
             {
                 printf("\n\t\t\t\tStudent not found!\n");
             }
             else
             {
-                modifyStudent_Second(tempData);
+                modifyStudent_Second(result->data.id);
             }
             break;
         }
@@ -469,10 +532,14 @@ void modifyStudent(struct student tempData)
     }
 }
 
-void modifyStudent_Second(struct student tempData)
+static void modifyStudent_Second(const char *id)
 {
-    struct Node *curnode = searchnode_byid(List, tempData.id);
-    printsearch(searchnode_byid(List, tempData.id));
+    struct Node *curnode = searchnode_byid(List, id);
+    if (curnode == NULL) {
+        return;
+    }
+
+    printsearch(curnode);
 
     printf("\n");
     printf("\t\t\t\t1. Student ID\t\t\t\n");
@@ -483,22 +550,15 @@ void modifyStudent_Second(struct student tempData)
     printf("\t\t\t\t6. English Score\t\t\t\n");
     printf("\t\t\t\tPlease select the field to modify:");
 
-    int choice = 0;
-    scanf("%d", &choice);
+    int field_choice = read_int("Please select", 1, 6);
 
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
-
-    switch (choice)
+    switch (field_choice)
     {
         case 1:
         {
             printf("\n\t\t\t\tCurrent ID: %s\n", curnode->data.id);
             printf("\t\t\t\tEnter new ID:");
-
-            scanf("%s", curnode->data.id);
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
+            read_string("New ID", curnode->data.id, sizeof(curnode->data.id));
             saveToFile("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
@@ -507,10 +567,7 @@ void modifyStudent_Second(struct student tempData)
         {
             printf("\n\t\t\t\tCurrent Name: %s\n", curnode->data.name);
             printf("\t\t\t\tEnter new Name:");
-
-            scanf("%s", curnode->data.name);
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
+            read_string("New Name", curnode->data.name, sizeof(curnode->data.name));
             saveToFile("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
@@ -519,10 +576,7 @@ void modifyStudent_Second(struct student tempData)
         {
             printf("\n\t\t\t\tCurrent Gender: %s\n", curnode->data.gender);
             printf("\t\t\t\tEnter new Gender:");
-
-            scanf("%s", curnode->data.gender);
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
+            read_string("New Gender", curnode->data.gender, sizeof(curnode->data.gender));
             saveToFile("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
@@ -530,11 +584,7 @@ void modifyStudent_Second(struct student tempData)
         case 4:
         {
             printf("\n\t\t\t\tCurrent Age: %d\n", curnode->data.age);
-            printf("\t\t\t\tEnter new Age:");
-
-            scanf("%d", &curnode->data.age);
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
+            curnode->data.age = read_int("New Age", 1, 150);
             saveToFile("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
@@ -542,13 +592,8 @@ void modifyStudent_Second(struct student tempData)
         case 5:
         {
             printf("\n\t\t\t\tCurrent Math Score: %.1f\n", curnode->data.math);
-            printf("\t\t\t\tEnter new Math Score:");
-
-            scanf("%f", &curnode->data.math);
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
+            curnode->data.math = read_float("New Math Score (0-100)", 0.0f, 100.0f);
             curnode->data.sumscore = curnode->data.math + curnode->data.english;
-
             saveToFile("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
@@ -556,13 +601,8 @@ void modifyStudent_Second(struct student tempData)
         case 6:
         {
             printf("\n\t\t\t\tCurrent English Score: %.1f\n", curnode->data.english);
-            printf("\t\t\t\tEnter new English Score:");
-
-            scanf("%f", &curnode->data.english);
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
+            curnode->data.english = read_float("New English Score (0-100)", 0.0f, 100.0f);
             curnode->data.sumscore = curnode->data.math + curnode->data.english;
-
             saveToFile("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
@@ -575,7 +615,7 @@ void modifyStudent_Second(struct student tempData)
     }
 }
 
-void deleteStudent(struct student tempData)
+static void deleteStudent(void)
 {
     printf("\n\t\t\t--------------Delete Student---------------\n");
     printList(List);
@@ -583,34 +623,27 @@ void deleteStudent(struct student tempData)
     printf("\t\t\t\t2. Delete by Name\t\t\t\t\n");
     printf("\t\t\t\tPlease select:");
 
-    int choice = 0;
-    scanf("%d", &choice);
-
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    int choice = read_int("Please select", 1, 2);
 
     switch (choice)
     {
     case 1:
         {
+            char id[ID_LEN];
             printf("\n\t\t\tEnter the student ID to delete:");
+            read_string("Student ID", id, sizeof(id));
 
-            scanf("%s", tempData.id);
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
-            Deletenode_byid(List, tempData.id);
+            Deletenode_byid(List, id);
             saveToFile("student.txt", List);
-
             break;
         }
     case 2:
         {
+            char name[NAME_LEN];
             printf("\n\t\t\tEnter the student name to delete:");
+            read_string("Student Name", name, sizeof(name));
 
-            scanf("%s", tempData.name);
-            while ((ch = getchar()) != '\n' && ch != EOF);
-
-            Deletenode_byname(List, tempData.name);
+            Deletenode_byname(List, name);
             saveToFile("student.txt", List);
             break;
         }
@@ -622,7 +655,7 @@ void deleteStudent(struct student tempData)
     }
 }
 
-void sortStudent()
+static void sortStudent(void)
 {
     printf("\n\t\t\t---------------Sort Students--------------\n");
     printf("\t\t\t\t1. Sort by ID (Low to High)\n");
@@ -631,11 +664,7 @@ void sortStudent()
     printf("\t\t\t\t4. Sort by Total Score (High to Low)\n");
     printf("\t\t\t\tPlease select (1-4):");
 
-    int choice = 0;
-    scanf("%d", &choice);
-
-    char ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
+    int choice = read_int("Please select", 1, 4);
 
     switch (choice)
     {
