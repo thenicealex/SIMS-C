@@ -1,12 +1,3 @@
-/*  ��Ŀ������C���Ե�ѧ������ϵͳ�������ļ���
-	���ߣ�Microsoft Visual C++ 2010 ѧϰ��
-	�����ˣ���곽��
-	ʱ�䣺2020.1.16-2020.2.2 �����깤
-	      2020.4.15-2020.6.25 һ���Ż�
-		  2020.7.25-2020.7.30 �����Ż�
-	ϰ�ã�C���Ե������Ĵ�������ӡ�����ң�ɾ���������ļ����������������
-		  ����ģ�黯������Ի��������ա�
-*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -22,709 +13,661 @@
 #define SET_CONSOLE_COLOR(color) system(color)
 #endif
 
-struct Node *List=NULL;//���������ڵ�
+struct Node *List = NULL;
 
+void menu();
+void function();
+void login();
+void login_Second();
+void rebackPassword();
+void addStudent(struct student tempData);
+void searchStudent(struct student tempData);
+void modifyStudent(struct student tempData);
+void modifyStudent_Second(struct student tempData);
+void deleteStudent(struct student tempData);
+void sortStudent();
 
-void menu();//������
-void function();//���ܽ���
-void login();//��¼����
-void login_Second();//��¼�ֽ���
-void rebackPassword();//�һ�����
-void addStudent(struct student tempData);//����ѧ����Ϣ
-void searchStudent(struct student tempData);//����ѧ����Ϣ
-void modifyStudent(struct student tempData);//�޸�ѧ����Ϣ
-void modifyStudent_Second(struct student tempData);//�޸�ѧ����Ϣ���ܵĲ��ִ���
-void deleteStudent(struct student tempData);//ɾ��ѧ����Ϣ
-void sortStudent();//����ѧ����Ϣ
-
-
-//������
 int main()
 {
-	SET_CONSOLE_TITLE("学生信息管理系统");
-	SET_CONSOLE_COLOR("color F0");
-	system("mode con cols=90 lines=30");
+    SET_CONSOLE_TITLE("Student Information Management System");
+    SET_CONSOLE_COLOR("color F0");
+    system("mode con cols=90 lines=30");
 
-	//����һ���������洢ѧ����Ϣ
-	List=creatList();
+    List = creatList();
 
-	//��ȡstudent.txt�ļ���Ϣ��������
-    //student.txt���ڴ�������е�ѧ����Ϣ
-	readFromFile("student.txt",List);
-	//����������
-	menu();
+    readFromFile("student.txt", List);
 
-	return 0;
+    menu();
+
+    return 0;
 }
-//������
+
 void menu()
 {
-	printf("\t\t\t----------------------------------------\n");
-    printf("\t\t\t|\t��ӭ������ǧѧ������ϵͳ\t|\n");
     printf("\t\t\t----------------------------------------\n");
-    printf("\t\t\t|\t1.��½\t\t\t\t|\n");
-    printf("\t\t\t|\t2.�һ�����\t\t\t|\n");
-    printf("\t\t\t|\t3.�˳�ϵͳ\t\t\t|\n");
+    printf("\t\t\t|\tWelcome to Student Management System\t|\n");
     printf("\t\t\t----------------------------------------\n");
-    printf("\t\t\t��ѡ����(1-3)(���س���ȷ��):");
+    printf("\t\t\t|\t1. Login\t\t\t|\n");
+    printf("\t\t\t|\t2. Forgot Password\t\t|\n");
+    printf("\t\t\t|\t3. Exit System\t\t\t|\n");
+    printf("\t\t\t----------------------------------------\n");
+    printf("\t\t\tPlease select (1-3) (press Enter to confirm):");
 
-	//��ȡѡ��
-	int choice = 0;
-	scanf("%d",&choice);
+    int choice = 0;
+    scanf("%d", &choice);
 
-	//���������
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	switch(choice)//�ж�ѡ��
-	{
-	case 1:
-		{
-			system("cls");//ˢ�½���
-			login();//����login()�������е�¼
-			break;
-		}
-	case 2:
-		{
-			system("cls");
-			rebackPassword();//����rebackPassword()�����һ�����
-			break;
-		}
-	case 3:
-		{
-			printf("\n\t\t\t");
-			exit(0);//�˳�ϵͳ
-		}
-	default:
-		{
-			//�����벻��ָ��ѡ��ʱ
-			printf("\n\t\t\t����������������룡\n\t\t\t");
-			system("pause");//��ͣ����
-			system("cls");//ˢ�½���
+    switch (choice)
+    {
+    case 1:
+        {
+            system("cls");
+            login();
+            break;
+        }
+    case 2:
+        {
+            system("cls");
+            rebackPassword();
+            break;
+        }
+    case 3:
+        {
+            printf("\n\t\t\t");
+            exit(0);
+        }
+    default:
+        {
+            printf("\n\t\t\tInvalid input! Please try again.\n\t\t\t");
+            system("pause");
+            system("cls");
 
-			menu();//���µ��ñ�����
-			break;
-		}
-	}
+            menu();
+            break;
+        }
+    }
 }
-//��¼����
+
 void login()
 {
-	int i = 0;
-	char Password[]="123";//��¼����
-	char tempPass[10]="0";//������˻�ȡ������
+    int i = 0;
+    char Password[] = "123";
+    char tempPass[10] = "0";
 
-	printf("\t\t\t---------------��½ϵͳ---------------\n\n");
-	printf("\t\t\t\t����Ա�˺�:��ǧ\n");
-	for(i=1;i<=3;i++)
-	{
-		printf("\t\t\t\t����Ա����:");
-		//��ȡ�������������
-		scanf("%s",tempPass);
+    printf("\t\t\t---------------Login System---------------\n\n");
+    printf("\t\t\t\tAdmin Account: admin\n");
+    for (i = 1; i <= 3; i++)
+    {
+        printf("\t\t\t\tAdmin Password:");
+        scanf("%s", tempPass);
 
-		//���������
-		char ch;
-		while((ch = getchar()) != '\n' && ch != EOF);
+        char ch;
+        while ((ch = getchar()) != '\n' && ch != EOF);
 
-		//�жϵ�¼����ͻ�ȡ�������Ƿ���ͬ
-        //strcmp()�����ַ����Ƚϣ����ַ�����ͬʱ����0
-		if(!strcmp(Password,tempPass))
-		{
-			printf("\n\t\t\t\t��½�ɹ�!");
-			printf("\n\t\t\t\t");
-			system("pause");//������ͣ
-			system("cls");//ˢ�½���
-			function();//����fuction()�������빦�ܽ���
-		}else
-		{
-			//�������ﵽ����
-			if(3 == i)
-			{
-				printf("\n\t\t\t\t�����������3��!������ѡ��\n\n");
-				printf("\t\t\t\t");
-				system("pause");
-			}else
-			{
-				printf("\n\t\t\t\t�����������%d��!����������!\n",i);
-			}
-		}
-	}
-	if(4 == i)
-	{
-		system("cls");
-		//��¼����ʧ�ܺ�����¼�ֽ���
-		login_Second();
-	}
+        if (!strcmp(Password, tempPass))
+        {
+            printf("\n\t\t\t\tLogin successful!");
+            printf("\n\t\t\t\t");
+            system("pause");
+            system("cls");
+            function();
+        }
+        else
+        {
+            if (3 == i)
+            {
+                printf("\n\t\t\t\tPassword incorrect 3 times! Please choose option.\n\n");
+                printf("\t\t\t\t");
+                system("pause");
+            }
+            else
+            {
+                printf("\n\t\t\t\tPassword incorrect %d time(s)! Please try again!\n", i);
+            }
+        }
+    }
+    if (4 == i)
+    {
+        system("cls");
+        login_Second();
+    }
 }
-//��¼�ֽ��棬�������������󳬹����κ�
+
 void login_Second()
 {
-	printf("\t\t\t-------------------------------------\n");
-	printf("\t\t\t|\t    1.�һ�����\t\t    |\n");
-	printf("\t\t\t|\t    2.���µ�¼\t\t    |\n");
-	printf("\t\t\t|\t    3.�˳�ϵͳ\t\t    |\n");
-	printf("\t\t\t-------------------------------------\n");
-	printf("\t\t\t\t   ��ѡ��(1-3)��");
+    printf("\t\t\t-------------------------------------\n");
+    printf("\t\t\t|\t    1. Forgot Password\t\t    |\n");
+    printf("\t\t\t|\t    2. Login Again\t\t    |\n");
+    printf("\t\t\t|\t    3. Exit System\t\t    |\n");
+    printf("\t\t\t-------------------------------------\n");
+    printf("\t\t\t\t   Please select (1-3):");
 
-	//��ȡѡ��
-	int choice = 0;
-	scanf("%d",&choice);
+    int choice = 0;
+    scanf("%d", &choice);
 
-	//���������
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);
-	switch(choice)
-	{
-	case 1:
-		{
-			system("cls");//ˢ�½���
-			rebackPassword();//����rebackPassword()�����һ�����
-			break;
-		}
-	case 2:
-		{
-			system("cls");
-			login();//����login()�������е�¼
-			break;
-		}
-	case 3:
-		{
-			printf("\n\t\t\t\t");
-			exit(0);//�˳�ϵͳ
-		}
-	default:
-		{
-			printf("\n\t\t\t\t����������������룡\n\t\t\t\t");
-			system("pause");//��ͣ����
-			system("cls");//ˢ�½���
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-			login_Second();//���µ��ñ�����
-			break;
-		}
-	}
+    switch (choice)
+    {
+    case 1:
+        {
+            system("cls");
+            rebackPassword();
+            break;
+        }
+    case 2:
+        {
+            system("cls");
+            login();
+            break;
+        }
+    case 3:
+        {
+            printf("\n\t\t\t\t");
+            exit(0);
+        }
+    default:
+        {
+            printf("\n\t\t\t\tInvalid input! Please try again.\n\t\t\t\t");
+            system("pause");
+            system("cls");
+
+            login_Second();
+            break;
+        }
+    }
 }
-//�һ�����
+
 void rebackPassword()
 {
-	int question_one=0;
-	int question_two=0;
-	int question_three=0;
+    int question_one = 0;
+    int question_two = 0;
+    int question_three = 0;
 
-	printf("\t\t\t    ------------�һ�����------------\n\n");
-	printf("\t\t\t\t    �������ܱ����⣺");
-	printf("\n\t\t\t\t    1.��Сʱ����������?");
-	printf("\n\t\t\t\t      ��:");
+    printf("\t\t\t    ------------Forgot Password------------\n\n");
+    printf("\t\t\t\t    Security Questions:\n");
+    printf("\n\t\t\t\t    1. What is your pet's name?\n");
+    printf("\n\t\t\t\t      Answer:");
 
-	scanf("%d",&question_one);//��ȡ�ܱ�һ��
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);//���������
+    scanf("%d", &question_one);
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	printf("\n\t\t\t\t    2.���δ���������ĸ�?");
-	printf("\n\t\t\t\t      ��:");
+    printf("\n\t\t\t\t    2. What is your favorite color?\n");
+    printf("\n\t\t\t\t      Answer:");
 
-	scanf("%d",&question_two);//��ȡ�ܱ�����
-	while((ch = getchar()) != '\n' && ch != EOF);//���������
+    scanf("%d", &question_two);
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	printf("\n\t\t\t\t    3.���Ը����ʲô?");
-	printf("\n\t\t\t\t      ��:");
+    printf("\n\t\t\t\t    3. What is your favorite food?\n");
+    printf("\n\t\t\t\t      Answer:");
 
-	scanf("%d",&question_three);//��ȡ�ܱ�����
-	while((ch = getchar()) != '\n' && ch != EOF);//���������
+    scanf("%d", &question_three);
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	if(1 == question_one && 2 == question_two && 3 == question_three)//�ж��ܱ��Ƿ���ȷ
-	{
-		printf("\n\n\t\t\t\t    ����Ա����:123\n\n\t\t\t\t    ");
-		system("pause");//��ͣϵͳ
-		system("cls");//ˢ�½���
-	}else
-	{
-		printf("\n\t\t\t\t     �𰸴���\n\n\t\t\t\t    ");
-		system("pause");
-		system("cls");
-	}
-	menu();//�������
-	
+    if (1 == question_one && 2 == question_two && 3 == question_three)
+    {
+        printf("\n\n\t\t\t\t    Admin Password: 123\n\n\t\t\t\t    ");
+        system("pause");
+        system("cls");
+    }
+    else
+    {
+        printf("\n\t\t\t\t     Incorrect answer\n\n\t\t\t\t    ");
+        system("pause");
+        system("cls");
+    }
+    menu();
 }
-//���ܽ���
+
 void function()
 {
     printf("\t\t\t-----------------------------------------\n");
-    printf("\t\t\t|\t��ӭʹ����ǧѧ������ϵͳ\t|\n");
+    printf("\t\t\t|\tWelcome to Student Management System\t|\n");
     printf("\t\t\t-----------------------------------------\n");
-    printf("\t\t\t|\t1.����ѧ����Ϣ\t\t\t|\n");
-    printf("\t\t\t|\t2.ͳ��ѧ����Ϣ\t\t\t|\n");
-    printf("\t\t\t|\t3.����ѧ����Ϣ\t\t\t|\n");
-    printf("\t\t\t|\t4.�޸�ѧ����Ϣ\t\t\t|\n");
-    printf("\t\t\t|\t5.ɾ��ѧ����Ϣ\t\t\t|\n");
-    printf("\t\t\t|\t6.����ѧ����Ϣ\t\t\t|\n");
-    printf("\t\t\t|\t7.������һ��\t\t\t|\n");
-	printf("\t\t\t|\t8.�˳�����\t\t\t|\n");
+    printf("\t\t\t|\t1. Add Student Info\t\t\t|\n");
+    printf("\t\t\t|\t2. View All Students\t\t\t|\n");
+    printf("\t\t\t|\t3. Search Student\t\t\t|\n");
+    printf("\t\t\t|\t4. Modify Student Info\t\t\t|\n");
+    printf("\t\t\t|\t5. Delete Student\t\t\t|\n");
+    printf("\t\t\t|\t6. Sort Students\t\t\t|\n");
+    printf("\t\t\t|\t7. Return to Main Menu\t\t\t|\n");
+    printf("\t\t\t|\t8. Exit System\t\t\t|\n");
     printf("\t\t\t-----------------------------------------\n");
-    printf("\t\t\t��ѡ����(1-8):");
-	
-	//�洢��ʱ����
-	struct student tempData={"0","0","0",0,0.0,0.0,0.0};
+    printf("\t\t\tPlease select (1-8):");
 
-	//��ȡѡ��
-	int choice = 0;
-	scanf("%d",&choice);
-	//���������
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);
+    struct student tempData = {"0", "0", "0", 0, 0.0, 0.0, 0.0};
 
-	switch(choice)
-	{
-	case 1:
-		{
-			//����addStudent()��������ѧ����Ϣ
-			addStudent(tempData);
-			printf("\n\t\t\t\t");
-			system("pause");//��ͣ����
-			system("cls");//ˢ�½���
-			break;
-		}
-	case 2:
-		{
-			printf("\n\t\t\t--------------ͳ��ѧ����Ϣ--------------\n");
-			//����printList()������ӡ����ѧ����Ϣ
-			printList(List);
-			printf("\n\t\t\t\t");
-			system("pause");
-			system("cls");
-			break;
-		}
-	case 3:
-		{
-			//����searchStudent()��������ѧ����Ϣ
-			searchStudent(tempData);
-			printf("\n\t\t\t\t");
-			system("pause");
-			system("cls");
-			break;
-		}
-	case 4:
-		{
-			//����modifyStudent()�����޸�ѧ����Ϣ
-			modifyStudent(tempData);
-			printf("\n\t\t\t\t");
-			system("pause");
-			system("cls");
-			break;
-		}
-	case 5:
-		{
-			//����deleteStudent()����ɾ��ѧ����Ϣ
-			deleteStudent(tempData);
-			printf("\n\t\t\t\t");
-			system("pause");
-			system("cls");
-			break;
-		}
-	case 6:
-		{
-			//����sortStudent()��������ѧ����Ϣ
-			sortStudent();
-			printf("\n\t\t\t\t");
-			system("pause");
-			system("cls");
-			break;
-		}
-	case 7:
-		{
-			system("cls");
-			menu();//����������
-			break;
-		}
-	case 8:
-		{
-			printf("\n\t\t\t\t");
-			exit(0);//�˳�ϵͳ
-		}
-	default:
-		{
-			printf("\n\t\t\t\t����������������룡\n");
-			printf("\n\t\t\t\t");
-			system("pause");//��ͣ����
-			system("cls");//ˢ�½���
-			break;
-		}
-	}
-	function();//���µ��ñ�����
+    int choice = 0;
+    scanf("%d", &choice);
+
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+
+    switch (choice)
+    {
+    case 1:
+        {
+            addStudent(tempData);
+            printf("\n\t\t\t\t");
+            system("pause");
+            system("cls");
+            break;
+        }
+    case 2:
+        {
+            printf("\n\t\t\t--------------All Students--------------\n");
+            printList(List);
+            printf("\n\t\t\t\t");
+            system("pause");
+            system("cls");
+            break;
+        }
+    case 3:
+        {
+            searchStudent(tempData);
+            printf("\n\t\t\t\t");
+            system("pause");
+            system("cls");
+            break;
+        }
+    case 4:
+        {
+            modifyStudent(tempData);
+            printf("\n\t\t\t\t");
+            system("pause");
+            system("cls");
+            break;
+        }
+    case 5:
+        {
+            deleteStudent(tempData);
+            printf("\n\t\t\t\t");
+            system("pause");
+            system("cls");
+            break;
+        }
+    case 6:
+        {
+            sortStudent();
+            printf("\n\t\t\t\t");
+            system("pause");
+            system("cls");
+            break;
+        }
+    case 7:
+        {
+            system("cls");
+            menu();
+            break;
+        }
+    case 8:
+        {
+            printf("\n\t\t\t\t");
+            exit(0);
+        }
+    default:
+        {
+            printf("\n\t\t\t\tInvalid input! Please try again.\n");
+            printf("\n\t\t\t\t");
+            system("pause");
+            system("cls");
+            break;
+        }
+    }
+    function();
 }
-//����ѧ����Ϣ
+
 void addStudent(struct student tempData)
 {
-	printf("\n\t\t\t--------------����ѧ����Ϣ--------------\n");
-	printf("\t\t\t\tѧ�ţ�");
-	scanf("%s",tempData.id);//��ȡѧ��ѧ��
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);//���������
+    printf("\n\t\t\t--------------Add Student--------------\n");
+    printf("\t\t\t\tStudent ID:");
+    scanf("%s", tempData.id);
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	printf("\t\t\t\t������");
-	scanf("%s",tempData.name);//��ȡѧ������
-	while((ch = getchar()) != '\n' && ch != EOF);
+    printf("\t\t\t\tName:");
+    scanf("%s", tempData.name);
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	printf("\t\t\t\t�Ա�");
-	scanf("%s",tempData.gender);//��ȡѧ���Ա�
-	while((ch = getchar()) != '\n' && ch != EOF);
+    printf("\t\t\t\tGender:");
+    scanf("%s", tempData.gender);
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	printf("\t\t\t\t���䣺");
-	scanf("%d",&tempData.age);//��ȡѧ������
-	while((ch = getchar()) != '\n' && ch != EOF);
+    printf("\t\t\t\tAge:");
+    scanf("%d", &tempData.age);
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	printf("\t\t\t\t��ѧ��");
-	scanf("%f",&tempData.math);//��ȡѧ����ѧ�ɼ�
-	while((ch = getchar()) != '\n' && ch != EOF);
+    printf("\t\t\t\tMath Score:");
+    scanf("%f", &tempData.math);
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	printf("\t\t\t\tӢ��ɼ���");
-	scanf("%f",&tempData.english);//��ȡѧ��Ӣ��ɼ�
-	while((ch = getchar()) != '\n' && ch != EOF);
+    printf("\t\t\t\tEnglish Score:");
+    scanf("%f", &tempData.english);
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-	tempData.sumscore=tempData.math+tempData.english;//����ѧ���ܳɼ�
-	printf("\t\t\t\t�ܳɼ�Ϊ��%.1f\n",tempData.sumscore);//��ӡѧ���ܳɼ�
+    tempData.sumscore = tempData.math + tempData.english;
+    printf("\t\t\t\tTotal Score: %.1f\n", tempData.sumscore);
 
-	insertnode(List,tempData);//�������в���ѧ����Ϣ
-	saveToFile("student.txt",List);//�������е�ѧ����Ϣ���浽�ļ�student.txt
-	printf("\n\t\t\t\t���ӳɹ���\n");
+    insertnode(List, tempData);
+    saveToFile("student.txt", List);
+    printf("\n\t\t\t\tAdd successful!\n");
 }
-//����ѧ����Ϣ
+
 void searchStudent(struct student tempData)
 {
-	printf("\n\t\t\t---------------����ѧ����Ϣ--------------\n\n");
-	printf("\t\t\t\t1.��ѧ�Ų���\t\t\t\t\n");
-	printf("\t\t\t\t2.����������\t\t\t\t\n");
-	printf("\t\t\t\t��ѡ����:");
+    printf("\n\t\t\t---------------Search Student--------------\n\n");
+    printf("\t\t\t\t1. Search by ID\t\t\t\n");
+    printf("\t\t\t\t2. Search by Name\t\t\t\n");
+    printf("\t\t\t\tPlease select:");
 
-	//��ȡѡ��
     int choice = 0;
-	scanf("%d",&choice);
-	//���������
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);
+    scanf("%d", &choice);
 
-	switch(choice)
-	{
-	case 1:
-		{
-			printf("\n\t\t\t������Ҫ���ҵ�ѧ����ѧ��:");
-			scanf("%s",tempData.id);//��ȡѧ��ѧ��
-			while((ch= getchar()) != '\n' && ch != EOF);//���������
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-			//searchnode_byid()����ֵΪ���ָ���NULL
-            //����NULL��˵��δ�鵽
-			if(searchnode_byid(List,tempData.id) == NULL)
-			{
-				//�������в����ڸ�ѧ��
-				printf("\n\t\t\t\t���޴���!\n");	
-			}else
-			{
-				//��ӡ���ҵ�ѧ����Ϣ
-				printsearch(searchnode_byid(List,tempData.id));
-			}
-			break;
-		}
-	case 2:
-		{
-			printf("\n\t\t\t������Ҫ���ҵ�ѧ��������:");
-			scanf("%s",tempData.name);//��ȡѧ������
-			while((ch = getchar()) != '\n' && ch != EOF);//���������
+    switch (choice)
+    {
+    case 1:
+        {
+            printf("\n\t\t\tEnter the student ID to search:");
+            scanf("%s", tempData.id);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			//searchnode_byname()����ֵΪ���ָ���NULL
-            //����NULL��˵��δ�鵽
-			if(searchnode_byname(List,tempData.name) == NULL)
-			{
-				//�������в����ڸ�����
-				printf("\n\t\t\t\t���޴���!\n");
-			}else
-			{
-				//��ӡ���ҵ�ѧ����Ϣ
-				printsearch(searchnode_byname(List,tempData.name));
-			}
-			break;
-		}
-	default:
-		{
-			printf("\n\t\t\t\t����������������룡\n");
-			break;
-		}
-	}
+            if (searchnode_byid(List, tempData.id) == NULL)
+            {
+                printf("\n\t\t\t\tStudent not found!\n");
+            }
+            else
+            {
+                printsearch(searchnode_byid(List, tempData.id));
+            }
+            break;
+        }
+    case 2:
+        {
+            printf("\n\t\t\tEnter the student name to search:");
+            scanf("%s", tempData.name);
+            while ((ch = getchar()) != '\n' && ch != EOF);
+
+            if (searchnode_byname(List, tempData.name) == NULL)
+            {
+                printf("\n\t\t\t\tStudent not found!\n");
+            }
+            else
+            {
+                printsearch(searchnode_byname(List, tempData.name));
+            }
+            break;
+        }
+    default:
+        {
+            printf("\n\t\t\t\tInvalid input! Please try again.\n");
+            break;
+        }
+    }
 }
-//�޸�ѧ����Ϣ
+
 void modifyStudent(struct student tempData)
 {
-	printf("\n\t\t\t--------�޸�ѧ����Ϣ--------\t\t\t\t\n");
-	//�ȵ���printList()������ӡȫ��ѧ����Ϣ
-	printList(List);
-	printf("\t\t\t\t1.��ѧ���޸�\t\t\t\t\n");
-	printf("\t\t\t\t2.�������޸�\t\t\t\t\n");
-	printf("\t\t\t\t��ѡ����:");
+    printf("\n\t\t\t--------Modify Student Info--------\t\t\t\t\n");
+    printList(List);
+    printf("\t\t\t\t1. Modify by ID\t\t\t\t\n");
+    printf("\t\t\t\t2. Modify by Name\t\t\t\t\n");
+    printf("\t\t\t\tPlease select:");
 
-	//��ȡѡ��
-	int choice = 0;
-	scanf("%d",&choice);
-	//���������
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);
+    int choice = 0;
+    scanf("%d", &choice);
 
-	switch(choice)
-	{
-	case 1:
-		{
-			printf("\n\t\t\t������Ҫ�޸ĵ�ѧ����ѧ�ţ�");
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-			scanf("%s",tempData.id);//��ȡѧ����ѧ��
-			while((ch = getchar()) != '\n' && ch != EOF);
+    switch (choice)
+    {
+    case 1:
+        {
+            printf("\n\t\t\tEnter the student ID to modify:");
+            scanf("%s", tempData.id);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			if(searchnode_byid(List,tempData.id) == NULL)
-			{
-				//�������в����ڸ�ѧ��
-				printf("\n\t\t\t\t���޴���!\n");
-			}else
-			{
-				//�޸�ѧ����Ϣ�ķֺ���
-				modifyStudent_Second(tempData);
-			}
-			break;
-		}
-	case 2:
-		{
-			printf("\n\t\t\t\t������Ҫ�޸ĵ�ѧ����������");
-			scanf("%s",tempData.name);//��ȡѧ������
-			while((ch = getchar()) != '\n' && ch != EOF);
+            if (searchnode_byid(List, tempData.id) == NULL)
+            {
+                printf("\n\t\t\t\tStudent not found!\n");
+            }
+            else
+            {
+                modifyStudent_Second(tempData);
+            }
+            break;
+        }
+    case 2:
+        {
+            printf("\n\t\t\t\tEnter the student name to modify:");
+            scanf("%s", tempData.name);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			if(searchnode_byname(List,tempData.name)==NULL)
-			{
-				//�������в����ڸ�����
-				printf("\n\t\t\t\t���޴���!\n");
-			}else
-			{
-				modifyStudent_Second(tempData);
-			}
-			break;
-		}
-	default:
-		{
-			printf("\t\t\t\t����������������룡\n");
-			function();//���빦�ܽ���
-			break;
-		}
-	}
+            if (searchnode_byname(List, tempData.name) == NULL)
+            {
+                printf("\n\t\t\t\tStudent not found!\n");
+            }
+            else
+            {
+                modifyStudent_Second(tempData);
+            }
+            break;
+        }
+    default:
+        {
+            printf("\t\t\t\tInvalid input! Please try again.\n");
+            function();
+            break;
+        }
+    }
 }
+
 void modifyStudent_Second(struct student tempData)
 {
-	//���¶���һ��ָ�벢ָ��Ҫ�޸ĵ�ѧ������Ϣ�Ľ��
-	struct Node *curnode=searchnode_byid(List,tempData.id);
-	//����printsearch()������ӡҪ�޸�ѧ������Ϣ
-	printsearch(searchnode_byid(List,tempData.id));
+    struct Node *curnode = searchnode_byid(List, tempData.id);
+    printsearch(searchnode_byid(List, tempData.id));
 
-	printf("\n");
-	printf("\t\t\t\t1.ѧ��\t\t\t\t\n");
-	printf("\t\t\t\t2.����\t\t\t\t\n");
-	printf("\t\t\t\t3.�Ա�\t\t\t\t\n");
-	printf("\t\t\t\t4.����\t\t\t\t\n");
-	printf("\t\t\t\t5.�����ɼ�\t\t\t\t\n");
-	printf("\t\t\t\t6.Ӣ��ɼ�\t\t\t\t\n");
-	printf("\t\t\t\t��ѡ��Ҫ�޸ĵ����ݣ�");
+    printf("\n");
+    printf("\t\t\t\t1. Student ID\t\t\t\n");
+    printf("\t\t\t\t2. Name\t\t\t\t\n");
+    printf("\t\t\t\t3. Gender\t\t\t\n");
+    printf("\t\t\t\t4. Age\t\t\t\t\n");
+    printf("\t\t\t\t5. Math Score\t\t\t\n");
+    printf("\t\t\t\t6. English Score\t\t\t\n");
+    printf("\t\t\t\tPlease select the field to modify:");
 
-	//��ȡѡ��
-	int choice = 0;
-	scanf("%d",&choice);
-	//���������
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);
+    int choice = 0;
+    scanf("%d", &choice);
 
-	switch(choice)
-	{
-		case 1:
-		{
-			printf("\n\t\t\t\t�޸�ǰ��ѧ�ţ�%s\n",curnode->data.id);
-			printf("\t\t\t\t�������޸ĺ��ѧ�ţ�");
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-			scanf("%s",curnode->data.id);
-			while((ch = getchar()) != '\n' && ch != EOF);
+    switch (choice)
+    {
+        case 1:
+        {
+            printf("\n\t\t\t\tCurrent ID: %s\n", curnode->data.id);
+            printf("\t\t\t\tEnter new ID:");
 
-			//���޸ĺ����Ϣ���浽�ļ�
-			saveToFile("student.txt",List);
-			printf("\n\t\t\t\t�޸ĳɹ�!\n");
-			break;
-		}
-		case 2:
-		{
-			printf("\n\t\t\t\t�޸�ǰ��������%s\n",curnode->data.name);
-			printf("\t\t\t\t�������޸ĺ��������");
+            scanf("%s", curnode->data.id);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			scanf("%s",curnode->data.name);
-			while((ch = getchar()) != '\n' && ch != EOF);
+            saveToFile("student.txt", List);
+            printf("\n\t\t\t\tModify successful!\n");
+            break;
+        }
+        case 2:
+        {
+            printf("\n\t\t\t\tCurrent Name: %s\n", curnode->data.name);
+            printf("\t\t\t\tEnter new Name:");
 
-			saveToFile("student.txt",List);
-			printf("\n\t\t\t\t�޸ĳɹ�!\n");
-			break;
-		}
-		case 3:
-		{
-			printf("\n\t\t\t\t�޸�ǰ���Ա�%s\n",curnode->data.gender);
-			printf("\t\t\t\t�������޸ĺ���Ա�");
+            scanf("%s", curnode->data.name);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			scanf("%s",curnode->data.gender);
-			while((ch= getchar()) != '\n' && ch != EOF);
+            saveToFile("student.txt", List);
+            printf("\n\t\t\t\tModify successful!\n");
+            break;
+        }
+        case 3:
+        {
+            printf("\n\t\t\t\tCurrent Gender: %s\n", curnode->data.gender);
+            printf("\t\t\t\tEnter new Gender:");
 
-			saveToFile("student.txt",List);
-			printf("\n\t\t\t\t�޸ĳɹ�!\n");
-			break;
-		}
-		case 4:
-		{
-			printf("\n\t\t\t\t�޸�ǰ�����䣺%d\n",curnode->data.age);
-			printf("\t\t\t\t�������޸ĺ�����䣺");
+            scanf("%s", curnode->data.gender);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			scanf("%d",&curnode->data.age);
-			while((ch = getchar()) != '\n' && ch != EOF);
+            saveToFile("student.txt", List);
+            printf("\n\t\t\t\tModify successful!\n");
+            break;
+        }
+        case 4:
+        {
+            printf("\n\t\t\t\tCurrent Age: %d\n", curnode->data.age);
+            printf("\t\t\t\tEnter new Age:");
 
-			saveToFile("student.txt",List);
-			printf("\n\t\t\t\t�޸ĳɹ�!\n");
-			break;
-		}
-		case 5:
-		{
-			printf("\n\t\t\t\t�޸�ǰ�ĸ����ɼ���%.1f\n",curnode->data.math);
-			printf("\t\t\t\t�������޸ĺ�ĸ����ɼ���");
+            scanf("%d", &curnode->data.age);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			scanf("%f",&curnode->data.math);
-			while((ch = getchar()) != '\n' && ch != EOF);
+            saveToFile("student.txt", List);
+            printf("\n\t\t\t\tModify successful!\n");
+            break;
+        }
+        case 5:
+        {
+            printf("\n\t\t\t\tCurrent Math Score: %.1f\n", curnode->data.math);
+            printf("\t\t\t\tEnter new Math Score:");
 
-			//�����ܳɼ�
-			curnode->data.sumscore=curnode->data.math+curnode->data.english;
+            scanf("%f", &curnode->data.math);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			saveToFile("student.txt",List);
-			printf("\n\t\t\t\t�޸ĳɹ�!\n");
-			break;
-		}
-		case 6:
-		{
-			printf("\n\t\t\t\t�޸�ǰ��Ӣ��ɼ���%.1f\n",curnode->data.english);
-			printf("\t\t\t\t�������޸ĺ��Ӣ��ɼ���");
+            curnode->data.sumscore = curnode->data.math + curnode->data.english;
 
-			scanf("%f",&curnode->data.english);
-			while((ch = getchar()) != '\n' && ch != EOF);
+            saveToFile("student.txt", List);
+            printf("\n\t\t\t\tModify successful!\n");
+            break;
+        }
+        case 6:
+        {
+            printf("\n\t\t\t\tCurrent English Score: %.1f\n", curnode->data.english);
+            printf("\t\t\t\tEnter new English Score:");
 
-			curnode->data.sumscore=curnode->data.math+curnode->data.english;
+            scanf("%f", &curnode->data.english);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			saveToFile("student.txt",List);
-			printf("\n\t\t\t\t�޸ĳɹ�!\n");
-			break;
-		}
-		default:
-		{
-			printf("\n\t\t\t\t����������������룡\n");
-			break;
-		}
-	}
+            curnode->data.sumscore = curnode->data.math + curnode->data.english;
+
+            saveToFile("student.txt", List);
+            printf("\n\t\t\t\tModify successful!\n");
+            break;
+        }
+        default:
+        {
+            printf("\n\t\t\t\tInvalid input! Please try again.\n");
+            break;
+        }
+    }
 }
-//ɾ��ѧ����Ϣ
+
 void deleteStudent(struct student tempData)
 {
-	printf("\n\t\t\t--------------ɾ��ѧ����Ϣ---------------\n");
-	//����printList()������ӡȫ��ѧ����Ϣ
-	printList(List);
-	printf("\t\t\t\t1.��ѧ��ɾ��\t\t\t\t\n");
-	printf("\t\t\t\t2.������ɾ��\t\t\t\t\n");
-	printf("\t\t\t\t��ѡ����:");
+    printf("\n\t\t\t--------------Delete Student---------------\n");
+    printList(List);
+    printf("\t\t\t\t1. Delete by ID\t\t\t\t\n");
+    printf("\t\t\t\t2. Delete by Name\t\t\t\t\n");
+    printf("\t\t\t\tPlease select:");
 
-	//��ȡѡ��
-	int choice = 0;
-	scanf("%d",&choice);
-	//���������
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);
+    int choice = 0;
+    scanf("%d", &choice);
 
-	switch(choice)
-	{
-	case 1:
-		{
-			printf("\n\t\t\t������Ҫɾ����ѧ����ѧ��:");
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
 
-			scanf("%s",tempData.id);
-			while((ch = getchar()) != '\n' && ch != EOF);
+    switch (choice)
+    {
+    case 1:
+        {
+            printf("\n\t\t\tEnter the student ID to delete:");
 
-			//��������ɾ��ѧ����Ϣ
-			Deletenode_byid(List,tempData.id);
-			//��ʣ����Ϣ���浽�ļ�
-			saveToFile("student.txt",List);
-			
-			break;
-		}
-	case 2:
-		{
-			printf("\n\t\t\t������Ҫɾ����ѧ��������:");
+            scanf("%s", tempData.id);
+            while ((ch = getchar()) != '\n' && ch != EOF);
 
-			scanf("%s",tempData.name);
-			while((ch = getchar()) != '\n' && ch != EOF);
+            Deletenode_byid(List, tempData.id);
+            saveToFile("student.txt", List);
 
-			Deletenode_byname(List,tempData.name);
-			saveToFile("student.txt",List);
-			break;
-		}
-	default:
-		{
-			printf("\n\t\t\t\t����������������룡\n");
-			break;
-		}
-	}
+            break;
+        }
+    case 2:
+        {
+            printf("\n\t\t\tEnter the student name to delete:");
+
+            scanf("%s", tempData.name);
+            while ((ch = getchar()) != '\n' && ch != EOF);
+
+            Deletenode_byname(List, tempData.name);
+            saveToFile("student.txt", List);
+            break;
+        }
+    default:
+        {
+            printf("\n\t\t\t\tInvalid input! Please try again.\n");
+            break;
+        }
+    }
 }
-//����
+
 void sortStudent()
 {
-	printf("\n\t\t\t---------------����ѧ����Ϣ--------------\n");
-	printf("\t\t\t\t1.����ѧ������(�ӵ͵���)\n");
-	printf("\t\t\t\t2.������ѧ�ɼ�����(�Ӹߵ���)\n");
-	printf("\t\t\t\t3.����Ӣ��ɼ�����(�Ӹߵ���)\n");
-	printf("\t\t\t\t4.�����ܳɼ�����(�Ӹߵ���)\n");
-	printf("\t\t\t\t��ѡ����(1-4):");
+    printf("\n\t\t\t---------------Sort Students--------------\n");
+    printf("\t\t\t\t1. Sort by ID (Low to High)\n");
+    printf("\t\t\t\t2. Sort by Math Score (High to Low)\n");
+    printf("\t\t\t\t3. Sort by English Score (High to Low)\n");
+    printf("\t\t\t\t4. Sort by Total Score (High to Low)\n");
+    printf("\t\t\t\tPlease select (1-4):");
 
-	//��ȡѡ��
-	int choice = 0;
-	scanf("%d",&choice);
-	//���������
-	char ch;
-	while((ch = getchar()) != '\n' && ch != EOF);
+    int choice = 0;
+    scanf("%d", &choice);
 
-	switch(choice)
-	{
-	case 1:
-		{
-			//��ѧ�Ŵӵ͵�����������
-			sortList_byid(List);
-			//����������Ϣ���浽�ļ�
-			saveToFile("student.txt",List);
-			//��ӡ�����е���Ϣ
-			printList(List);
-			break;
-		}
-	case 2:
-		{
-			//����ѧ�ɼ��Ӹߵ�����������
-			sortList_bymath(List);
-			printList(List);
-			break;
-		}
-	case 3:
-		{
-			//��Ӣ��ɼ��Ӹߵ�����������
-			sortList_byenglish(List);
-			printList(List);
-			break;
-		}
-	case 4:
-		{
-			//���ܳɼ��Ӹߵ�����������
-			sortList_bysumscore(List);
-			printList(List);
-			break;
-		}
-	default:
-		{
-			printf("\n\t\t\t\t����������������룡\n");
-			break;
-		}
-	}
+    char ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+
+    switch (choice)
+    {
+    case 1:
+        {
+            sortList_byid(List);
+            saveToFile("student.txt", List);
+            printList(List);
+            break;
+        }
+    case 2:
+        {
+            sortList_bymath(List);
+            printList(List);
+            break;
+        }
+    case 3:
+        {
+            sortList_byenglish(List);
+            printList(List);
+            break;
+        }
+    case 4:
+        {
+            sortList_bysumscore(List);
+            printList(List);
+            break;
+        }
+    default:
+        {
+            printf("\n\t\t\t\tInvalid input! Please try again.\n");
+            break;
+        }
+    }
 }
