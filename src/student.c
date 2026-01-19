@@ -13,13 +13,32 @@
 #define SET_CONSOLE_COLOR(color) system(color)
 #endif
 
-static struct Node *List = NULL;
+#define CLS_COMMAND "clear"
+#define PAUSE_MESSAGE "Press Enter to continue..."
 
 static void clear_input_buffer(void)
 {
     int ch;
     while ((ch = getchar()) != '\n' && ch != EOF);
 }
+
+static void clear_screen(void)
+{
+#ifdef _WIN32
+    clear_screen();
+#else
+    system(CLS_COMMAND);
+#endif
+}
+
+static void pause_system(void)
+{
+    printf(PAUSE_MESSAGE);
+    fflush(stdout);
+    clear_input_buffer();
+}
+
+static struct Node *List = NULL;
 
 static int read_line(char *buffer, size_t size)
 {
@@ -120,9 +139,13 @@ static void sortStudent(void);
 
 int main(void)
 {
+#ifdef _WIN32
     SET_CONSOLE_TITLE("Student Information Management System");
     SET_CONSOLE_COLOR("color F0");
     system("mode con cols=90 lines=30");
+#else
+    SET_CONSOLE_TITLE("Student Information Management System");
+#endif
 
     List = creatList();
     if (List == NULL) {
@@ -160,13 +183,13 @@ static void menu(void)
     {
     case 1:
         {
-            system("cls");
+            clear_screen();
             login();
             break;
         }
     case 2:
         {
-            system("cls");
+            clear_screen();
             rebackPassword();
             break;
         }
@@ -178,8 +201,8 @@ static void menu(void)
     default:
         {
             printf("\n\t\t\tInvalid input! Please try again.\n\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             menu();
             break;
         }
@@ -207,8 +230,8 @@ static void login(void)
         {
             printf("\n\t\t\t\tLogin successful!");
             printf("\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             function();
             return;
         }
@@ -218,7 +241,7 @@ static void login(void)
             {
                 printf("\n\t\t\t\tPassword incorrect 3 times! Please choose option.\n\n");
                 printf("\t\t\t\t");
-                system("pause");
+                pause_system();
             }
             else
             {
@@ -228,7 +251,7 @@ static void login(void)
     }
     if (4 == i)
     {
-        system("cls");
+        clear_screen();
         login_Second();
     }
 }
@@ -248,13 +271,13 @@ static void login_Second(void)
     {
     case 1:
         {
-            system("cls");
+            clear_screen();
             rebackPassword();
             break;
         }
     case 2:
         {
-            system("cls");
+            clear_screen();
             login();
             break;
         }
@@ -266,8 +289,8 @@ static void login_Second(void)
     default:
         {
             printf("\n\t\t\t\tInvalid input! Please try again.\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             login_Second();
             break;
         }
@@ -298,14 +321,14 @@ static void rebackPassword(void)
     if (1 == question_one && 2 == question_two && 3 == question_three)
     {
         printf("\n\n\t\t\t\t    Admin Password: 123\n\n\t\t\t\t    ");
-        system("pause");
-        system("cls");
+        pause_system();
+        clear_screen();
     }
     else
     {
         printf("\n\t\t\t\t     Incorrect answer\n\n\t\t\t\t    ");
-        system("pause");
-        system("cls");
+        pause_system();
+        clear_screen();
     }
     menu();
 }
@@ -334,8 +357,8 @@ static void function(void)
         {
             addStudent();
             printf("\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             break;
         }
     case 2:
@@ -343,45 +366,45 @@ static void function(void)
             printf("\n\t\t\t--------------All Students--------------\n");
             printList(List);
             printf("\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             break;
         }
     case 3:
         {
             searchStudent();
             printf("\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             break;
         }
     case 4:
         {
             modifyStudent();
             printf("\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             break;
         }
     case 5:
         {
             deleteStudent();
             printf("\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             break;
         }
     case 6:
         {
             sortStudent();
             printf("\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             break;
         }
     case 7:
         {
-            system("cls");
+            clear_screen();
             menu();
             break;
         }
@@ -394,8 +417,8 @@ static void function(void)
         {
             printf("\n\t\t\t\tInvalid input! Please try again.\n");
             printf("\n\t\t\t\t");
-            system("pause");
-            system("cls");
+            pause_system();
+            clear_screen();
             break;
         }
     }
