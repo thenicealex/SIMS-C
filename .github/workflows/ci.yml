@@ -21,6 +21,4 @@ jobs:
       run: make
 
     - name: Test executable exists
-      run: |
-        test -f student_manager
-        ./student_manager --help 2>/dev/null || true
+      run: test -f student_manager
