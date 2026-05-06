@@ -443,6 +443,11 @@ static void addStudent(void)
 
     printf("\t\t\t\tTotal Score: %.1f\n", tempData.math + tempData.english);
 
+    if (mylist_exists_by_id(List, tempData.id)) {
+        printf("\n\t\t\t\tStudent ID already exists! Add failed.\n");
+        return;
+    }
+
     mylist_insert_front(List, tempData);
     mylist_save_file("student.txt", List);
     printf("\n\t\t\t\tAdd successful!\n");

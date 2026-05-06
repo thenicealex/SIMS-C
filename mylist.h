@@ -40,6 +40,7 @@ void mylist_sort_by_id(struct mylist_node *head);
 void mylist_sort_by_math(struct mylist_node *head);
 void mylist_sort_by_english(struct mylist_node *head);
 void mylist_sort_by_total(struct mylist_node *head);
+int mylist_exists_by_id(const struct mylist_node *head, const char *id);
 int mylist_load_file(const char *filename, struct mylist_node *head);
 int mylist_save_file(const char *filename, struct mylist_node *head);
 
@@ -209,6 +210,11 @@ struct mylist_node *mylist_find_by_name(const struct mylist_node *head, const ch
     }
 
     return NULL;
+}
+
+int mylist_exists_by_id(const struct mylist_node *head, const char *id)
+{
+    return mylist_find_by_id(head, id) != NULL;
 }
 
 void mylist_print_one(const struct mylist_node *node)
@@ -388,8 +394,10 @@ int mylist_load_file(const char *filename, struct mylist_node *head)
                                 temp.id, temp.name, temp.gender,
                                 &temp.age, &temp.math, &temp.english)) == 6)
     {
-        mylist_insert_front(head, temp);
-        line_count++;
+        if (!mylist_exists_by_id(head, temp.id)) {
+            mylist_insert_front(head, temp);
+            line_count++;
+        }
     }
 
     if (ferror(fp)) {
