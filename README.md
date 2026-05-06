@@ -8,10 +8,8 @@ A student information management system developed in C, providing CRUD operation
 
 ```
 student-management-system/
-├── include/          # Header files
-│   └── mylist.h      # Single-file header library (STB style): declarations + implementation
-├── src/              # Source code
-│   └── student.c     # Main program and business logic
+├── mylist.h          # Single-file header library (STB style): declarations + implementation
+├── student.c         # Main program and business logic
 ├── build/            # Build output
 ├── docs/             # Documentation
 ├── tests/            # Tests

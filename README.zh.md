@@ -8,10 +8,8 @@
 
 ```
 student-management-system/
-├── include/          # 头文件目录
-│   └── mylist.h      # 单文件头文件库（STB 风格）：声明 + 实现
-├── src/              # 源代码目录
-│   └── student.c     # 主程序和业务逻辑
+├── mylist.h          # 单文件头文件库（STB 风格）：声明 + 实现
+├── student.c         # 主程序和业务逻辑
 ├── build/            # 编译输出目录
 ├── docs/             # 文档目录
 ├── tests/            # 测试文件目录

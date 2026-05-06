@@ -1,16 +1,15 @@
 .PHONY: all clean run
 
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -Iinclude
+CFLAGS = -Wall -Wextra -std=c99
 TARGET = student_manager
-SRC = src
 BUILD = build
 
 all: $(TARGET)
 
-$(TARGET): $(SRC)/student.c include/mylist.h
+$(TARGET): student.c mylist.h
 	@mkdir -p $(BUILD)
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)/student.c
+	$(CC) $(CFLAGS) -o $(TARGET) student.c
 
 run: $(TARGET)
 	./$(TARGET)
