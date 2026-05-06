@@ -27,7 +27,7 @@ static void clear_input_buffer(void)
 static void clear_screen(void)
 {
 #ifdef _WIN32
-    clear_screen();
+    system("cls");
 #else
     system(CLS_COMMAND);
 #endif
@@ -40,7 +40,7 @@ static void pause_system(void)
     clear_input_buffer();
 }
 
-static struct Node *List = NULL;
+static struct mylist_node *List = NULL;
 
 static int read_line(char *buffer, size_t size)
 {
@@ -149,21 +149,21 @@ int main(void)
     SET_CONSOLE_TITLE("Student Information Management System");
 #endif
 
-    List = creatList();
+    List = mylist_create();
     if (List == NULL) {
         fprintf(stderr, "Failed to create list. Exiting.\n");
         return 1;
     }
 
-    int lines = readFromFile("student.txt", List);
+    int lines = mylist_load_file("student.txt", List);
     if (lines < 0) {
         printf("\t\t\t\tWarning: Could not load data file.\n");
     }
 
     menu();
 
-    saveToFile("student.txt", List);
-    freeList(List);
+    mylist_save_file("student.txt", List);
+    mylist_free(List);
     List = NULL;
 
     return 0;
@@ -215,7 +215,7 @@ static void login(void)
 {
     int i;
     char Password[] = "123";
-    char tempPass[MAX_INPUT_LEN] = {0};
+    char tempPass[MYLIST_MAX_INPUT_LEN] = {0};
 
     printf("\t\t\t---------------Login System---------------\n\n");
     printf("\t\t\t\tAdmin Account: admin\n");
@@ -366,7 +366,7 @@ static void function(void)
     case 2:
         {
             printf("\n\t\t\t--------------All Students--------------\n");
-            printList(List);
+            mylist_print_all(List);
             printf("\n\t\t\t\t");
             pause_system();
             clear_screen();
@@ -429,7 +429,7 @@ static void function(void)
 
 static void addStudent(void)
 {
-    struct student tempData;
+    struct mylist_student tempData;
 
     printf("\n\t\t\t--------------Add Student--------------\n");
 
@@ -441,11 +441,11 @@ static void addStudent(void)
     tempData.math = read_float("Math Score (0-100)", 0.0f, 100.0f);
     tempData.english = read_float("English Score (0-100)", 0.0f, 100.0f);
 
-    tempData.sumscore = tempData.math + tempData.english;
-    printf("\t\t\t\tTotal Score: %.1f\n", tempData.sumscore);
+    tempData.total = tempData.math + tempData.english;
+    printf("\t\t\t\tTotal Score: %.1f\n", tempData.total);
 
-    insertnode(List, tempData);
-    saveToFile("student.txt", List);
+    mylist_insert_front(List, tempData);
+    mylist_save_file("student.txt", List);
     printf("\n\t\t\t\tAdd successful!\n");
 }
 
@@ -462,35 +462,35 @@ static void searchStudent(void)
     {
     case 1:
         {
-            char id[ID_LEN];
+            char id[MYLIST_ID_LEN];
             printf("\n\t\t\tEnter the student ID to search:");
             read_string("Student ID", id, sizeof(id));
 
-            struct Node *result = searchnode_byid(List, id);
+            struct mylist_node *result = mylist_find_by_id(List, id);
             if (result == NULL)
             {
                 printf("\n\t\t\t\tStudent not found!\n");
             }
             else
             {
-                printsearch(result);
+                mylist_print_one(result);
             }
             break;
         }
     case 2:
         {
-            char name[NAME_LEN];
+            char name[MYLIST_NAME_LEN];
             printf("\n\t\t\tEnter the student name to search:");
             read_string("Student Name", name, sizeof(name));
 
-            struct Node *result = searchnode_byname(List, name);
+            struct mylist_node *result = mylist_find_by_name(List, name);
             if (result == NULL)
             {
                 printf("\n\t\t\t\tStudent not found!\n");
             }
             else
             {
-                printsearch(result);
+                mylist_print_one(result);
             }
             break;
         }
@@ -505,7 +505,7 @@ static void searchStudent(void)
 static void modifyStudent(void)
 {
     printf("\n\t\t\t--------Modify Student Info--------\t\t\t\t\n");
-    printList(List);
+    mylist_print_all(List);
     printf("\t\t\t\t1. Modify by ID\t\t\t\t\n");
     printf("\t\t\t\t2. Modify by Name\t\t\t\t\n");
     printf("\t\t\t\tPlease select:");
@@ -516,11 +516,11 @@ static void modifyStudent(void)
     {
     case 1:
         {
-            char id[ID_LEN];
+            char id[MYLIST_ID_LEN];
             printf("\n\t\t\tEnter the student ID to modify:");
             read_string("Student ID", id, sizeof(id));
 
-            struct Node *result = searchnode_byid(List, id);
+            struct mylist_node *result = mylist_find_by_id(List, id);
             if (result == NULL)
             {
                 printf("\n\t\t\t\tStudent not found!\n");
@@ -533,11 +533,11 @@ static void modifyStudent(void)
         }
     case 2:
         {
-            char name[NAME_LEN];
+            char name[MYLIST_NAME_LEN];
             printf("\n\t\t\t\tEnter the student name to modify:");
             read_string("Student Name", name, sizeof(name));
 
-            struct Node *result = searchnode_byname(List, name);
+            struct mylist_node *result = mylist_find_by_name(List, name);
             if (result == NULL)
             {
                 printf("\n\t\t\t\tStudent not found!\n");
@@ -559,12 +559,12 @@ static void modifyStudent(void)
 
 static void modifyStudent_Second(const char *id)
 {
-    struct Node *curnode = searchnode_byid(List, id);
+    struct mylist_node *curnode = mylist_find_by_id(List, id);
     if (curnode == NULL) {
         return;
     }
 
-    printsearch(curnode);
+    mylist_print_one(curnode);
 
     printf("\n");
     printf("\t\t\t\t1. Student ID\t\t\t\n");
@@ -584,7 +584,7 @@ static void modifyStudent_Second(const char *id)
             printf("\n\t\t\t\tCurrent ID: %s\n", curnode->data.id);
             printf("\t\t\t\tEnter new ID:");
             read_string("New ID", curnode->data.id, sizeof(curnode->data.id));
-            saveToFile("student.txt", List);
+            mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
         }
@@ -593,7 +593,7 @@ static void modifyStudent_Second(const char *id)
             printf("\n\t\t\t\tCurrent Name: %s\n", curnode->data.name);
             printf("\t\t\t\tEnter new Name:");
             read_string("New Name", curnode->data.name, sizeof(curnode->data.name));
-            saveToFile("student.txt", List);
+            mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
         }
@@ -602,7 +602,7 @@ static void modifyStudent_Second(const char *id)
             printf("\n\t\t\t\tCurrent Gender: %s\n", curnode->data.gender);
             printf("\t\t\t\tEnter new Gender:");
             read_string("New Gender", curnode->data.gender, sizeof(curnode->data.gender));
-            saveToFile("student.txt", List);
+            mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
         }
@@ -610,7 +610,7 @@ static void modifyStudent_Second(const char *id)
         {
             printf("\n\t\t\t\tCurrent Age: %d\n", curnode->data.age);
             curnode->data.age = read_int("New Age", 1, 150);
-            saveToFile("student.txt", List);
+            mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
         }
@@ -618,8 +618,8 @@ static void modifyStudent_Second(const char *id)
         {
             printf("\n\t\t\t\tCurrent Math Score: %.1f\n", curnode->data.math);
             curnode->data.math = read_float("New Math Score (0-100)", 0.0f, 100.0f);
-            curnode->data.sumscore = curnode->data.math + curnode->data.english;
-            saveToFile("student.txt", List);
+            curnode->data.total = curnode->data.math + curnode->data.english;
+            mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
         }
@@ -627,8 +627,8 @@ static void modifyStudent_Second(const char *id)
         {
             printf("\n\t\t\t\tCurrent English Score: %.1f\n", curnode->data.english);
             curnode->data.english = read_float("New English Score (0-100)", 0.0f, 100.0f);
-            curnode->data.sumscore = curnode->data.math + curnode->data.english;
-            saveToFile("student.txt", List);
+            curnode->data.total = curnode->data.math + curnode->data.english;
+            mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
         }
@@ -643,7 +643,7 @@ static void modifyStudent_Second(const char *id)
 static void deleteStudent(void)
 {
     printf("\n\t\t\t--------------Delete Student---------------\n");
-    printList(List);
+    mylist_print_all(List);
     printf("\t\t\t\t1. Delete by ID\t\t\t\t\n");
     printf("\t\t\t\t2. Delete by Name\t\t\t\t\n");
     printf("\t\t\t\tPlease select:");
@@ -654,22 +654,22 @@ static void deleteStudent(void)
     {
     case 1:
         {
-            char id[ID_LEN];
+            char id[MYLIST_ID_LEN];
             printf("\n\t\t\tEnter the student ID to delete:");
             read_string("Student ID", id, sizeof(id));
 
-            Deletenode_byid(List, id);
-            saveToFile("student.txt", List);
+            mylist_remove_by_id(List, id);
+            mylist_save_file("student.txt", List);
             break;
         }
     case 2:
         {
-            char name[NAME_LEN];
+            char name[MYLIST_NAME_LEN];
             printf("\n\t\t\tEnter the student name to delete:");
             read_string("Student Name", name, sizeof(name));
 
-            Deletenode_byname(List, name);
-            saveToFile("student.txt", List);
+            mylist_remove_by_name(List, name);
+            mylist_save_file("student.txt", List);
             break;
         }
     default:
@@ -695,27 +695,27 @@ static void sortStudent(void)
     {
     case 1:
         {
-            sortList_byid(List);
-            saveToFile("student.txt", List);
-            printList(List);
+            mylist_sort_by_id(List);
+            mylist_save_file("student.txt", List);
+            mylist_print_all(List);
             break;
         }
     case 2:
         {
-            sortList_bymath(List);
-            printList(List);
+            mylist_sort_by_math(List);
+            mylist_print_all(List);
             break;
         }
     case 3:
         {
-            sortList_byenglish(List);
-            printList(List);
+            mylist_sort_by_english(List);
+            mylist_print_all(List);
             break;
         }
     case 4:
         {
-            sortList_bysumscore(List);
-            printList(List);
+            mylist_sort_by_total(List);
+            mylist_print_all(List);
             break;
         }
     default:

@@ -1,54 +1,54 @@
-#ifndef _MYLIST_H_
-#define _MYLIST_H_
+#ifndef MYLIST_H_
+#define MYLIST_H_
 
-#define NAME_LEN 31
-#define ID_LEN 16
-#define GENDER_LEN 11
-#define MAX_INPUT_LEN 256
+#define MYLIST_NAME_LEN 31
+#define MYLIST_ID_LEN 16
+#define MYLIST_GENDER_LEN 11
+#define MYLIST_MAX_INPUT_LEN 256
 
-struct student
+struct mylist_student
 {
-	char id[ID_LEN];
-	char name[NAME_LEN];
-	char gender[GENDER_LEN];
+	char id[MYLIST_ID_LEN];
+	char name[MYLIST_NAME_LEN];
+	char gender[MYLIST_GENDER_LEN];
 	int age;
 	float math;
 	float english;
-	float sumscore;
+	float total;
 };
 
-struct Node
+struct mylist_node
 {
-	struct student data;
-	struct Node *next;
+	struct mylist_student data;
+	struct mylist_node *next;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct Node *creatList(void);
-void freeList(struct Node *head);
-struct Node *creatnode(struct student data);
-void insertnode(struct Node *StudentListhead, struct student data);
-void Deletenode_byid(struct Node *StudentListhead, const char *id);
-void Deletenode_byname(struct Node *StudentListhead, const char *name);
-struct Node *searchnode_byid(const struct Node *StudentListhead, const char *id);
-struct Node *searchnode_byname(const struct Node *StudentListhead, const char *name);
-void printsearch(const struct Node *curnode);
-void printList(const struct Node *StudentListhead);
-void sortList_byid(struct Node *StudentListhead);
-void sortList_bymath(struct Node *StudentListhead);
-void sortList_byenglish(struct Node *StudentListhead);
-void sortList_bysumscore(struct Node *StudentListhead);
-int readFromFile(const char *File_student, struct Node *StudentListhead);
-int saveToFile(const char *File_student, struct Node *StudentListhead);
+struct mylist_node *mylist_create(void);
+void mylist_free(struct mylist_node *head);
+struct mylist_node *mylist_node_create(struct mylist_student data);
+void mylist_insert_front(struct mylist_node *head, struct mylist_student data);
+void mylist_remove_by_id(struct mylist_node *head, const char *id);
+void mylist_remove_by_name(struct mylist_node *head, const char *name);
+struct mylist_node *mylist_find_by_id(const struct mylist_node *head, const char *id);
+struct mylist_node *mylist_find_by_name(const struct mylist_node *head, const char *name);
+void mylist_print_one(const struct mylist_node *node);
+void mylist_print_all(const struct mylist_node *head);
+void mylist_sort_by_id(struct mylist_node *head);
+void mylist_sort_by_math(struct mylist_node *head);
+void mylist_sort_by_english(struct mylist_node *head);
+void mylist_sort_by_total(struct mylist_node *head);
+int mylist_load_file(const char *filename, struct mylist_node *head);
+int mylist_save_file(const char *filename, struct mylist_node *head);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _MYLIST_H_ */
+#endif /* MYLIST_H_ */
 
 #ifdef MYLIST_IMPLEMENTATION
 
@@ -56,212 +56,207 @@ int saveToFile(const char *File_student, struct Node *StudentListhead);
 #include <string.h>
 #include <stdlib.h>
 
-struct Node *creatList(void)
+struct mylist_node *mylist_create(void)
 {
-    struct Node *StudentListhead;
-    StudentListhead = (struct Node *)malloc(sizeof(struct Node));
-    if (StudentListhead == NULL) {
+    struct mylist_node *head = (struct mylist_node *)malloc(sizeof(struct mylist_node));
+    if (head == NULL) {
         return NULL;
     }
-    StudentListhead->next = NULL;
-    return StudentListhead;
+    head->next = NULL;
+    return head;
 }
 
-void freeList(struct Node *head)
+void mylist_free(struct mylist_node *head)
 {
     if (head == NULL) {
         return;
     }
 
-    struct Node *current = head;
+    struct mylist_node *current = head;
     while (current != NULL) {
-        struct Node *next = current->next;
+        struct mylist_node *next = current->next;
         free(current);
         current = next;
     }
 }
 
-struct Node *creatnode(struct student data)
+struct mylist_node *mylist_node_create(struct mylist_student data)
 {
-    struct Node *newnode = (struct Node *)malloc(sizeof(struct Node));
-    if (newnode == NULL) {
+    struct mylist_node *node = (struct mylist_node *)malloc(sizeof(struct mylist_node));
+    if (node == NULL) {
         return NULL;
     }
 
-    newnode->data = data;
-    newnode->next = NULL;
+    node->data = data;
+    node->next = NULL;
 
-    return newnode;
+    return node;
 }
 
-void insertnode(struct Node *StudentListhead, struct student data)
+void mylist_insert_front(struct mylist_node *head, struct mylist_student data)
 {
-    if (StudentListhead == NULL) {
+    if (head == NULL) {
         return;
     }
 
-    struct Node *newnode = creatnode(data);
-    if (newnode == NULL) {
+    struct mylist_node *node = mylist_node_create(data);
+    if (node == NULL) {
         return;
     }
 
-    newnode->next = StudentListhead->next;
-    StudentListhead->next = newnode;
+    node->next = head->next;
+    head->next = node;
 }
 
-void Deletenode_byid(struct Node *StudentListhead, const char *id)
+void mylist_remove_by_id(struct mylist_node *head, const char *id)
 {
-    if (StudentListhead == NULL || id == NULL) {
+    if (head == NULL || id == NULL) {
         return;
     }
 
-    struct Node *posFrontNode = StudentListhead;
-    struct Node *posNode = StudentListhead->next;
+    struct mylist_node *prev = head;
+    struct mylist_node *curr = head->next;
 
-    if (posNode == NULL)
+    if (curr == NULL)
     {
         printf("\n\t\t\t\tNo data found! Cannot delete!\n");
         return;
     }
-    else
+
+    while (curr != NULL && strcmp(curr->data.id, id) != 0)
     {
-        while (posNode != NULL && strcmp(posNode->data.id, id) != 0)
-        {
-            posFrontNode = posNode;
-            posNode = posFrontNode->next;
-        }
-
-        if (posNode == NULL)
-        {
-            printf("\n\t\t\t\tStudent not found! Cannot delete!\n");
-            return;
-        }
-
-        posFrontNode->next = posNode->next;
-        free(posNode);
-        printf("\n\t\t\t\tDelete successful!\n");
+        prev = curr;
+        curr = prev->next;
     }
-}
 
-void Deletenode_byname(struct Node *StudentListhead, const char *name)
-{
-    if (StudentListhead == NULL || name == NULL) {
+    if (curr == NULL)
+    {
+        printf("\n\t\t\t\tStudent not found! Cannot delete!\n");
         return;
     }
 
-    struct Node *posFrontNode = StudentListhead;
-    struct Node *posNode = StudentListhead->next;
+    prev->next = curr->next;
+    free(curr);
+    printf("\n\t\t\t\tDelete successful!\n");
+}
 
-    if (posNode == NULL)
+void mylist_remove_by_name(struct mylist_node *head, const char *name)
+{
+    if (head == NULL || name == NULL) {
+        return;
+    }
+
+    struct mylist_node *prev = head;
+    struct mylist_node *curr = head->next;
+
+    if (curr == NULL)
     {
         printf("\n\t\t\t\tNo data found! Cannot delete!\n");
         return;
     }
-    else
+
+    while (curr != NULL && strcmp(curr->data.name, name) != 0)
     {
-        while (posNode != NULL && strcmp(posNode->data.name, name) != 0)
-        {
-            posFrontNode = posNode;
-            posNode = posFrontNode->next;
-        }
-
-        if (posNode == NULL)
-        {
-            printf("\n\t\t\t\tStudent not found! Cannot delete!\n");
-            return;
-        }
-
-        posFrontNode->next = posNode->next;
-        free(posNode);
-        printf("\n\t\t\t\tDelete successful!\n");
+        prev = curr;
+        curr = prev->next;
     }
+
+    if (curr == NULL)
+    {
+        printf("\n\t\t\t\tStudent not found! Cannot delete!\n");
+        return;
+    }
+
+    prev->next = curr->next;
+    free(curr);
+    printf("\n\t\t\t\tDelete successful!\n");
 }
 
-struct Node *searchnode_byid(const struct Node *StudentListhead, const char *id)
+struct mylist_node *mylist_find_by_id(const struct mylist_node *head, const char *id)
 {
-    if (StudentListhead == NULL || id == NULL) {
+    if (head == NULL || id == NULL) {
         return NULL;
     }
 
-    const struct Node *pmove = StudentListhead->next;
+    const struct mylist_node *curr = head->next;
 
-    while (pmove != NULL)
+    while (curr != NULL)
     {
-        if (strcmp(pmove->data.id, id) == 0)
+        if (strcmp(curr->data.id, id) == 0)
         {
-            return (struct Node *)pmove;
+            return (struct mylist_node *)curr;
         }
-        pmove = pmove->next;
+        curr = curr->next;
     }
 
     return NULL;
 }
 
-struct Node *searchnode_byname(const struct Node *StudentListhead, const char *name)
+struct mylist_node *mylist_find_by_name(const struct mylist_node *head, const char *name)
 {
-    if (StudentListhead == NULL || name == NULL) {
+    if (head == NULL || name == NULL) {
         return NULL;
     }
 
-    const struct Node *pmove = StudentListhead->next;
+    const struct mylist_node *curr = head->next;
 
-    while (pmove != NULL)
+    while (curr != NULL)
     {
-        if (strcmp(pmove->data.name, name) == 0)
+        if (strcmp(curr->data.name, name) == 0)
         {
-            return (struct Node *)pmove;
+            return (struct mylist_node *)curr;
         }
-        pmove = pmove->next;
+        curr = curr->next;
     }
 
     return NULL;
 }
 
-void printsearch(const struct Node *curnode)
+void mylist_print_one(const struct mylist_node *node)
 {
-    if (curnode == NULL) {
+    if (node == NULL) {
         return;
     }
 
     printf("\tID\t\tName\tGender\tAge\tMath\tEnglish\tTotal\n");
     printf("\t%-10s\t%-4s\t%-6s\t%-3d\t%.1f\t\t%.1f\t\t%.1f\n",
-           curnode->data.id, curnode->data.name, curnode->data.gender,
-           curnode->data.age, curnode->data.math, curnode->data.english,
-           curnode->data.sumscore);
+           node->data.id, node->data.name, node->data.gender,
+           node->data.age, node->data.math, node->data.english,
+           node->data.total);
 }
 
-void printList(const struct Node *StudentListhead)
+void mylist_print_all(const struct mylist_node *head)
 {
-    if (StudentListhead == NULL) {
+    if (head == NULL) {
         return;
     }
 
-    const struct Node *pmove = StudentListhead->next;
+    const struct mylist_node *curr = head->next;
 
     printf("\tID\t\tName\tGender\tAge\tMath\tEnglish\tTotal\n");
 
-    while (pmove != NULL)
+    while (curr != NULL)
     {
         printf("\t%-10s\t%-4s\t%-6s\t%-3d\t%.1f\t\t%.1f\t\t%.1f\n",
-               pmove->data.id, pmove->data.name, pmove->data.gender,
-               pmove->data.age, pmove->data.math, pmove->data.english,
-               pmove->data.sumscore);
-        pmove = pmove->next;
+               curr->data.id, curr->data.name, curr->data.gender,
+               curr->data.age, curr->data.math, curr->data.english,
+               curr->data.total);
+        curr = curr->next;
     }
     printf("\n");
 }
 
 static int compare_id(const void *a, const void *b)
 {
-    const struct student *sa = (const struct student *)a;
-    const struct student *sb = (const struct student *)b;
+    const struct mylist_student *sa = (const struct mylist_student *)a;
+    const struct mylist_student *sb = (const struct mylist_student *)b;
     return strcmp(sa->id, sb->id);
 }
 
 static int compare_math(const void *a, const void *b)
 {
-    const struct student *sa = (const struct student *)a;
-    const struct student *sb = (const struct student *)b;
+    const struct mylist_student *sa = (const struct mylist_student *)a;
+    const struct mylist_student *sb = (const struct mylist_student *)b;
     if (sa->math < sb->math) return 1;
     if (sa->math > sb->math) return -1;
     return 0;
@@ -269,41 +264,41 @@ static int compare_math(const void *a, const void *b)
 
 static int compare_english(const void *a, const void *b)
 {
-    const struct student *sa = (const struct student *)a;
-    const struct student *sb = (const struct student *)b;
+    const struct mylist_student *sa = (const struct mylist_student *)a;
+    const struct mylist_student *sb = (const struct mylist_student *)b;
     if (sa->english < sb->english) return 1;
     if (sa->english > sb->english) return -1;
     return 0;
 }
 
-static int compare_sumscore(const void *a, const void *b)
+static int compare_total(const void *a, const void *b)
 {
-    const struct student *sa = (const struct student *)a;
-    const struct student *sb = (const struct student *)b;
-    if (sa->sumscore < sb->sumscore) return 1;
-    if (sa->sumscore > sb->sumscore) return -1;
+    const struct mylist_student *sa = (const struct mylist_student *)a;
+    const struct mylist_student *sb = (const struct mylist_student *)b;
+    if (sa->total < sb->total) return 1;
+    if (sa->total > sb->total) return -1;
     return 0;
 }
 
-static void swap_nodes(struct student *a, struct student *b)
+static void swap_nodes(struct mylist_student *a, struct mylist_student *b)
 {
-    struct student temp = *a;
+    struct mylist_student temp = *a;
     *a = *b;
     *b = temp;
 }
 
-static size_t get_list_length(const struct Node *head)
+static size_t get_list_length(const struct mylist_node *head)
 {
     size_t count = 0;
-    const struct Node *current = head->next;
-    while (current != NULL) {
+    const struct mylist_node *curr = head->next;
+    while (curr != NULL) {
         count++;
-        current = current->next;
+        curr = curr->next;
     }
     return count;
 }
 
-static void sort_list_nodes(struct Node *head, int (*compare)(const void *, const void *))
+static void sort_nodes(struct mylist_node *head, int (*compare)(const void *, const void *))
 {
     if (head == NULL || head->next == NULL) {
         printf("\n\t\t\t\tNo data found! Cannot sort!\n");
@@ -316,17 +311,17 @@ static void sort_list_nodes(struct Node *head, int (*compare)(const void *, cons
         return;
     }
 
-    struct student *array = (struct student *)malloc(length * sizeof(struct student));
+    struct mylist_student *array = (struct mylist_student *)malloc(length * sizeof(struct mylist_student));
     if (array == NULL) {
         printf("\n\t\t\t\tMemory allocation failed!\n");
         return;
     }
 
-    struct Node *pmove = head->next;
+    struct mylist_node *curr = head->next;
     size_t index = 0;
-    while (pmove != NULL && index < length) {
-        array[index++] = pmove->data;
-        pmove = pmove->next;
+    while (curr != NULL && index < length) {
+        array[index++] = curr->data;
+        curr = curr->next;
     }
 
     for (size_t i = 1; i < length; i++) {
@@ -337,105 +332,105 @@ static void sort_list_nodes(struct Node *head, int (*compare)(const void *, cons
         }
     }
 
-    pmove = head->next;
+    curr = head->next;
     index = 0;
-    while (pmove != NULL && index < length) {
-        pmove->data = array[index++];
-        pmove = pmove->next;
+    while (curr != NULL && index < length) {
+        curr->data = array[index++];
+        curr = curr->next;
     }
 
     free(array);
 }
 
-void sortList_byid(struct Node *StudentListhead)
+void mylist_sort_by_id(struct mylist_node *head)
 {
-    sort_list_nodes(StudentListhead, compare_id);
+    sort_nodes(head, compare_id);
 }
 
-void sortList_bymath(struct Node *StudentListhead)
+void mylist_sort_by_math(struct mylist_node *head)
 {
-    sort_list_nodes(StudentListhead, compare_math);
+    sort_nodes(head, compare_math);
 }
 
-void sortList_byenglish(struct Node *StudentListhead)
+void mylist_sort_by_english(struct mylist_node *head)
 {
-    sort_list_nodes(StudentListhead, compare_english);
+    sort_nodes(head, compare_english);
 }
 
-void sortList_bysumscore(struct Node *StudentListhead)
+void mylist_sort_by_total(struct mylist_node *head)
 {
-    sort_list_nodes(StudentListhead, compare_sumscore);
+    sort_nodes(head, compare_total);
 }
 
-int readFromFile(const char *File_student, struct Node *StudentListhead)
+int mylist_load_file(const char *filename, struct mylist_node *head)
 {
-    if (File_student == NULL || StudentListhead == NULL) {
+    if (filename == NULL || head == NULL) {
         return -1;
     }
 
-    FILE *fpstu = fopen(File_student, "r");
-    if (fpstu == NULL)
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL)
     {
-        fpstu = fopen(File_student, "w");
-        if (fpstu == NULL) {
+        fp = fopen(filename, "w");
+        if (fp == NULL) {
             return -1;
         }
-        fclose(fpstu);
+        fclose(fp);
         return 0;
     }
 
-    struct student tempData;
+    struct mylist_student temp;
     int line_count = 0;
     int read_count;
 
-    while ((read_count = fscanf(fpstu, "%14s\t%30s\t%10s\t%d\t%f\t\t%f\t\t%f\n",
-                                tempData.id, tempData.name, tempData.gender,
-                                &tempData.age, &tempData.math, &tempData.english,
-                                &tempData.sumscore)) == 7)
+    while ((read_count = fscanf(fp, "%14s\t%30s\t%10s\t%d\t%f\t\t%f\t\t%f\n",
+                                temp.id, temp.name, temp.gender,
+                                &temp.age, &temp.math, &temp.english,
+                                &temp.total)) == 7)
     {
-        insertnode(StudentListhead, tempData);
+        mylist_insert_front(head, temp);
         line_count++;
     }
 
-    if (ferror(fpstu)) {
-        fclose(fpstu);
+    if (ferror(fp)) {
+        fclose(fp);
         return -1;
     }
 
-    fclose(fpstu);
+    fclose(fp);
     return line_count;
 }
 
-int saveToFile(const char *File_student, struct Node *StudentListhead)
+int mylist_save_file(const char *filename, struct mylist_node *head)
 {
-    if (File_student == NULL || StudentListhead == NULL) {
+    if (filename == NULL || head == NULL) {
         return -1;
     }
 
-    FILE *fpstu = fopen(File_student, "w");
-    if (fpstu == NULL) {
+    FILE *fp = fopen(filename, "w");
+    if (fp == NULL) {
         return -1;
     }
 
-    struct Node *pmove = StudentListhead->next;
+    struct mylist_node *curr = head->next;
     int count = 0;
 
-    while (pmove != NULL)
+    while (curr != NULL)
     {
-        fprintf(fpstu, "%s\t%s\t%s\t%d\t%.1f\t\t%.1f\t\t%.1f\n",
-                pmove->data.id, pmove->data.name, pmove->data.gender,
-                pmove->data.age, pmove->data.math, pmove->data.english,
-                pmove->data.sumscore);
-        pmove = pmove->next;
+        fprintf(fp, "%s\t%s\t%s\t%d\t%.1f\t\t%.1f\t\t%.1f\n",
+                curr->data.id, curr->data.name, curr->data.gender,
+                curr->data.age, curr->data.math, curr->data.english,
+                curr->data.total);
+        curr = curr->next;
         count++;
     }
 
-    if (ferror(fpstu)) {
-        fclose(fpstu);
+    if (ferror(fp)) {
+        fclose(fp);
         return -1;
     }
 
-    fclose(fpstu);
+    fclose(fp);
     return count;
 }
 
