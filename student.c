@@ -441,8 +441,7 @@ static void addStudent(void)
     tempData.math = read_float("Math Score (0-100)", 0.0f, 100.0f);
     tempData.english = read_float("English Score (0-100)", 0.0f, 100.0f);
 
-    tempData.total = tempData.math + tempData.english;
-    printf("\t\t\t\tTotal Score: %.1f\n", tempData.total);
+    printf("\t\t\t\tTotal Score: %.1f\n", tempData.math + tempData.english);
 
     mylist_insert_front(List, tempData);
     mylist_save_file("student.txt", List);
@@ -618,7 +617,6 @@ static void modifyStudent_Second(const char *id)
         {
             printf("\n\t\t\t\tCurrent Math Score: %.1f\n", curnode->data.math);
             curnode->data.math = read_float("New Math Score (0-100)", 0.0f, 100.0f);
-            curnode->data.total = curnode->data.math + curnode->data.english;
             mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;
@@ -627,7 +625,6 @@ static void modifyStudent_Second(const char *id)
         {
             printf("\n\t\t\t\tCurrent English Score: %.1f\n", curnode->data.english);
             curnode->data.english = read_float("New English Score (0-100)", 0.0f, 100.0f);
-            curnode->data.total = curnode->data.math + curnode->data.english;
             mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
             break;

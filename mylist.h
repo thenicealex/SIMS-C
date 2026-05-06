@@ -14,7 +14,6 @@ struct mylist_student
 	int age;
 	float math;
 	float english;
-	float total;
 };
 
 struct mylist_node
@@ -222,7 +221,7 @@ void mylist_print_one(const struct mylist_node *node)
     printf("\t%-10s\t%-4s\t%-6s\t%-3d\t%.1f\t\t%.1f\t\t%.1f\n",
            node->data.id, node->data.name, node->data.gender,
            node->data.age, node->data.math, node->data.english,
-           node->data.total);
+           node->data.math + node->data.english);
 }
 
 void mylist_print_all(const struct mylist_node *head)
@@ -240,7 +239,7 @@ void mylist_print_all(const struct mylist_node *head)
         printf("\t%-10s\t%-4s\t%-6s\t%-3d\t%.1f\t\t%.1f\t\t%.1f\n",
                curr->data.id, curr->data.name, curr->data.gender,
                curr->data.age, curr->data.math, curr->data.english,
-               curr->data.total);
+               curr->data.math + curr->data.english);
         curr = curr->next;
     }
     printf("\n");
@@ -275,8 +274,10 @@ static int compare_total(const void *a, const void *b)
 {
     const struct mylist_student *sa = (const struct mylist_student *)a;
     const struct mylist_student *sb = (const struct mylist_student *)b;
-    if (sa->total < sb->total) return 1;
-    if (sa->total > sb->total) return -1;
+    float ta = sa->math + sa->english;
+    float tb = sb->math + sb->english;
+    if (ta < tb) return 1;
+    if (ta > tb) return -1;
     return 0;
 }
 
@@ -383,10 +384,9 @@ int mylist_load_file(const char *filename, struct mylist_node *head)
     int line_count = 0;
     int read_count;
 
-    while ((read_count = fscanf(fp, "%14s\t%30s\t%10s\t%d\t%f\t\t%f\t\t%f\n",
+    while ((read_count = fscanf(fp, "%15s\t%30s\t%10s\t%d\t%f\t%f\n",
                                 temp.id, temp.name, temp.gender,
-                                &temp.age, &temp.math, &temp.english,
-                                &temp.total)) == 7)
+                                &temp.age, &temp.math, &temp.english)) == 6)
     {
         mylist_insert_front(head, temp);
         line_count++;
@@ -417,10 +417,9 @@ int mylist_save_file(const char *filename, struct mylist_node *head)
 
     while (curr != NULL)
     {
-        fprintf(fp, "%s\t%s\t%s\t%d\t%.1f\t\t%.1f\t\t%.1f\n",
+        fprintf(fp, "%s\t%s\t%s\t%d\t%.1f\t%.1f\n",
                 curr->data.id, curr->data.name, curr->data.gender,
-                curr->data.age, curr->data.math, curr->data.english,
-                curr->data.total);
+                curr->data.age, curr->data.math, curr->data.english);
         curr = curr->next;
         count++;
     }
