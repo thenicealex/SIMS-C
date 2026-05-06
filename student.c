@@ -40,6 +40,11 @@ static void pause_system(void)
     clear_input_buffer();
 }
 
+static void indent(int n)
+{
+    while (n-- > 0) printf("\t");
+}
+
 static struct mylist_node *List = NULL;
 
 static int read_line(char *buffer, size_t size)
@@ -66,13 +71,13 @@ static void read_string(const char *prompt, char *buffer, size_t size)
         return;
     }
 
-    printf("\t\t\t\t%s:", prompt);
+    indent(4); printf("%s:", prompt);
     buffer[0] = '\0';
 
     while (buffer[0] == '\0') {
         if (!read_line(buffer, size)) {
             clear_input_buffer();
-            printf("\t\t\t\tInvalid input. Please try again: ");
+            indent(4); printf("Invalid input. Please try again: ");
         }
     }
 }
@@ -82,19 +87,19 @@ static int read_int(const char *prompt, int min, int max)
     int value;
     int result;
 
-    printf("\t\t\t\t%s:", prompt);
+    indent(4); printf("%s:", prompt);
 
     while (1) {
         result = scanf("%d", &value);
         clear_input_buffer();
 
         if (result != 1) {
-            printf("\t\t\t\tInvalid input. Please enter a number: ");
+            indent(4); printf("Invalid input. Please enter a number: ");
             continue;
         }
 
         if (value < min || value > max) {
-            printf("\t\t\t\tPlease enter a number between %d and %d: ", min, max);
+            indent(4); printf("Please enter a number between %d and %d: ", min, max);
             continue;
         }
 
@@ -107,19 +112,19 @@ static float read_float(const char *prompt, float min, float max)
     float value;
     int result;
 
-    printf("\t\t\t\t%s:", prompt);
+    indent(4); printf("%s:", prompt);
 
     while (1) {
         result = scanf("%f", &value);
         clear_input_buffer();
 
         if (result != 1) {
-            printf("\t\t\t\tInvalid input. Please enter a number: ");
+            indent(4); printf("Invalid input. Please enter a number: ");
             continue;
         }
 
         if (value < min || value > max) {
-            printf("\t\t\t\tPlease enter a number between %.1f and %.1f: ", min, max);
+            indent(4); printf("Please enter a number between %.1f and %.1f: ", min, max);
             continue;
         }
 
@@ -157,7 +162,7 @@ int main(void)
 
     int lines = mylist_load_file("student.txt", List);
     if (lines < 0) {
-        printf("\t\t\t\tWarning: Could not load data file.\n");
+        indent(4); printf("Warning: Could not load data file.\n");
     }
 
     menu();
@@ -171,13 +176,13 @@ int main(void)
 
 static void menu(void)
 {
-    printf("\t\t\t----------------------------------------\n");
-    printf("\t\t\t|\tWelcome to Student Management System\t|\n");
-    printf("\t\t\t----------------------------------------\n");
-    printf("\t\t\t|\t1. Login\t\t\t|\n");
-    printf("\t\t\t|\t2. Forgot Password\t\t|\n");
-    printf("\t\t\t|\t3. Exit System\t\t\t|\n");
-    printf("\t\t\t----------------------------------------\n");
+    indent(3); printf("----------------------------------------\n");
+    indent(3); printf("|\tWelcome to Student Management System\t|\n");
+    indent(3); printf("----------------------------------------\n");
+    indent(3); printf("|\t1. Login\t\t\t|\n");
+    indent(3); printf("|\t2. Forgot Password\t\t|\n");
+    indent(3); printf("|\t3. Exit System\t\t\t|\n");
+    indent(3); printf("----------------------------------------\n");
 
     int choice = read_int("Please select (1-3)", 1, 3);
 
@@ -217,11 +222,11 @@ static void login(void)
     char Password[] = "123";
     char tempPass[MYLIST_MAX_INPUT_LEN] = {0};
 
-    printf("\t\t\t---------------Login System---------------\n\n");
-    printf("\t\t\t\tAdmin Account: admin\n");
+    indent(3); printf("---------------Login System---------------\n\n");
+    indent(4); printf("Admin Account: admin\n");
     for (i = 1; i <= 3; i++)
     {
-        printf("\t\t\t\tAdmin Password:");
+        indent(4); printf("Admin Password:");
 
         if (!read_line(tempPass, sizeof(tempPass))) {
             clear_input_buffer();
@@ -242,7 +247,7 @@ static void login(void)
             if (3 == i)
             {
                 printf("\n\t\t\t\tPassword incorrect 3 times! Please choose option.\n\n");
-                printf("\t\t\t\t");
+                indent(4); printf("");
                 pause_system();
             }
             else
@@ -260,12 +265,12 @@ static void login(void)
 
 static void login_Second(void)
 {
-    printf("\t\t\t-------------------------------------\n");
-    printf("\t\t\t|\t    1. Forgot Password\t\t    |\n");
-    printf("\t\t\t|\t    2. Login Again\t\t    |\n");
-    printf("\t\t\t|\t    3. Exit System\t\t    |\n");
-    printf("\t\t\t-------------------------------------\n");
-    printf("\t\t\t\t   Please select (1-3):");
+    indent(3); printf("-------------------------------------\n");
+    indent(3); printf("|\t    1. Forgot Password\t\t    |\n");
+    indent(3); printf("|\t    2. Login Again\t\t    |\n");
+    indent(3); printf("|\t    3. Exit System\t\t    |\n");
+    indent(3); printf("-------------------------------------\n");
+    indent(4); printf("   Please select (1-3):");
 
     int choice = read_int("Please select", 1, 3);
 
@@ -303,8 +308,8 @@ static void rebackPassword(void)
 {
     int question_one, question_two, question_three;
 
-    printf("\t\t\t    ------------Forgot Password------------\n\n");
-    printf("\t\t\t\t    Security Questions:\n");
+    indent(3); printf("    ------------Forgot Password------------\n\n");
+    indent(4); printf("    Security Questions:\n");
     printf("\n\t\t\t\t    1. What is your pet's name?\n");
     printf("\n\t\t\t\t      Answer:");
 
@@ -337,19 +342,19 @@ static void rebackPassword(void)
 
 static void function(void)
 {
-    printf("\t\t\t-----------------------------------------\n");
-    printf("\t\t\t|\tWelcome to Student Management System\t|\n");
-    printf("\t\t\t-----------------------------------------\n");
-    printf("\t\t\t|\t1. Add Student Info\t\t\t|\n");
-    printf("\t\t\t|\t2. View All Students\t\t\t|\n");
-    printf("\t\t\t|\t3. Search Student\t\t\t|\n");
-    printf("\t\t\t|\t4. Modify Student Info\t\t\t|\n");
-    printf("\t\t\t|\t5. Delete Student\t\t\t|\n");
-    printf("\t\t\t|\t6. Sort Students\t\t\t|\n");
-    printf("\t\t\t|\t7. Return to Main Menu\t\t\t|\n");
-    printf("\t\t\t|\t8. Exit System\t\t\t|\n");
-    printf("\t\t\t-----------------------------------------\n");
-    printf("\t\t\tPlease select (1-8):");
+    indent(3); printf("-----------------------------------------\n");
+    indent(3); printf("|\tWelcome to Student Management System\t|\n");
+    indent(3); printf("-----------------------------------------\n");
+    indent(3); printf("|\t1. Add Student Info\t\t\t|\n");
+    indent(3); printf("|\t2. View All Students\t\t\t|\n");
+    indent(3); printf("|\t3. Search Student\t\t\t|\n");
+    indent(3); printf("|\t4. Modify Student Info\t\t\t|\n");
+    indent(3); printf("|\t5. Delete Student\t\t\t|\n");
+    indent(3); printf("|\t6. Sort Students\t\t\t|\n");
+    indent(3); printf("|\t7. Return to Main Menu\t\t\t|\n");
+    indent(3); printf("|\t8. Exit System\t\t\t|\n");
+    indent(3); printf("-----------------------------------------\n");
+    indent(3); printf("Please select (1-8):");
 
     int choice = read_int("Please select", 1, 8);
 
@@ -441,7 +446,7 @@ static void addStudent(void)
     tempData.math = read_float("Math Score (0-100)", 0.0f, 100.0f);
     tempData.english = read_float("English Score (0-100)", 0.0f, 100.0f);
 
-    printf("\t\t\t\tTotal Score: %.1f\n", tempData.math + tempData.english);
+    indent(4); printf("Total Score: %.1f\n", tempData.math + tempData.english);
 
     if (mylist_exists_by_id(List, tempData.id)) {
         printf("\n\t\t\t\tStudent ID already exists! Add failed.\n");
@@ -456,9 +461,9 @@ static void addStudent(void)
 static void searchStudent(void)
 {
     printf("\n\t\t\t---------------Search Student--------------\n\n");
-    printf("\t\t\t\t1. Search by ID\t\t\t\n");
-    printf("\t\t\t\t2. Search by Name\t\t\t\n");
-    printf("\t\t\t\tPlease select:");
+    indent(4); printf("1. Search by ID\t\t\t\n");
+    indent(4); printf("2. Search by Name\t\t\t\n");
+    indent(4); printf("Please select:");
 
     int choice = read_int("Please select", 1, 2);
 
@@ -510,9 +515,9 @@ static void modifyStudent(void)
 {
     printf("\n\t\t\t--------Modify Student Info--------\t\t\t\t\n");
     mylist_print_all(List);
-    printf("\t\t\t\t1. Modify by ID\t\t\t\t\n");
-    printf("\t\t\t\t2. Modify by Name\t\t\t\t\n");
-    printf("\t\t\t\tPlease select:");
+    indent(4); printf("1. Modify by ID\t\t\t\t\n");
+    indent(4); printf("2. Modify by Name\t\t\t\t\n");
+    indent(4); printf("Please select:");
 
     int choice = read_int("Please select", 1, 2);
 
@@ -554,7 +559,7 @@ static void modifyStudent(void)
         }
     default:
         {
-            printf("\t\t\t\tInvalid input! Please try again.\n");
+            indent(4); printf("Invalid input! Please try again.\n");
             function();
             break;
         }
@@ -571,13 +576,13 @@ static void modifyStudent_Second(const char *id)
     mylist_print_one(curnode);
 
     printf("\n");
-    printf("\t\t\t\t1. Student ID\t\t\t\n");
-    printf("\t\t\t\t2. Name\t\t\t\t\n");
-    printf("\t\t\t\t3. Gender\t\t\t\n");
-    printf("\t\t\t\t4. Age\t\t\t\t\n");
-    printf("\t\t\t\t5. Math Score\t\t\t\n");
-    printf("\t\t\t\t6. English Score\t\t\t\n");
-    printf("\t\t\t\tPlease select the field to modify:");
+    indent(4); printf("1. Student ID\t\t\t\n");
+    indent(4); printf("2. Name\t\t\t\t\n");
+    indent(4); printf("3. Gender\t\t\t\n");
+    indent(4); printf("4. Age\t\t\t\t\n");
+    indent(4); printf("5. Math Score\t\t\t\n");
+    indent(4); printf("6. English Score\t\t\t\n");
+    indent(4); printf("Please select the field to modify:");
 
     int field_choice = read_int("Please select", 1, 6);
 
@@ -586,7 +591,7 @@ static void modifyStudent_Second(const char *id)
         case 1:
         {
             printf("\n\t\t\t\tCurrent ID: %s\n", curnode->data.id);
-            printf("\t\t\t\tEnter new ID:");
+            indent(4); printf("Enter new ID:");
             read_string("New ID", curnode->data.id, sizeof(curnode->data.id));
             mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
@@ -595,7 +600,7 @@ static void modifyStudent_Second(const char *id)
         case 2:
         {
             printf("\n\t\t\t\tCurrent Name: %s\n", curnode->data.name);
-            printf("\t\t\t\tEnter new Name:");
+            indent(4); printf("Enter new Name:");
             read_string("New Name", curnode->data.name, sizeof(curnode->data.name));
             mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
@@ -604,7 +609,7 @@ static void modifyStudent_Second(const char *id)
         case 3:
         {
             printf("\n\t\t\t\tCurrent Gender: %s\n", curnode->data.gender);
-            printf("\t\t\t\tEnter new Gender:");
+            indent(4); printf("Enter new Gender:");
             read_string("New Gender", curnode->data.gender, sizeof(curnode->data.gender));
             mylist_save_file("student.txt", List);
             printf("\n\t\t\t\tModify successful!\n");
@@ -646,9 +651,9 @@ static void deleteStudent(void)
 {
     printf("\n\t\t\t--------------Delete Student---------------\n");
     mylist_print_all(List);
-    printf("\t\t\t\t1. Delete by ID\t\t\t\t\n");
-    printf("\t\t\t\t2. Delete by Name\t\t\t\t\n");
-    printf("\t\t\t\tPlease select:");
+    indent(4); printf("1. Delete by ID\t\t\t\t\n");
+    indent(4); printf("2. Delete by Name\t\t\t\t\n");
+    indent(4); printf("Please select:");
 
     int choice = read_int("Please select", 1, 2);
 
@@ -685,11 +690,11 @@ static void deleteStudent(void)
 static void sortStudent(void)
 {
     printf("\n\t\t\t---------------Sort Students--------------\n");
-    printf("\t\t\t\t1. Sort by ID (Low to High)\n");
-    printf("\t\t\t\t2. Sort by Math Score (High to Low)\n");
-    printf("\t\t\t\t3. Sort by English Score (High to Low)\n");
-    printf("\t\t\t\t4. Sort by Total Score (High to Low)\n");
-    printf("\t\t\t\tPlease select (1-4):");
+    indent(4); printf("1. Sort by ID (Low to High)\n");
+    indent(4); printf("2. Sort by Math Score (High to Low)\n");
+    indent(4); printf("3. Sort by English Score (High to Low)\n");
+    indent(4); printf("4. Sort by Total Score (High to Low)\n");
+    indent(4); printf("Please select (1-4):");
 
     int choice = read_int("Please select", 1, 4);
 
