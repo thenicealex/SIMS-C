@@ -1,58 +1,71 @@
-# 学生信息管理系统 (C语言)
+# Student Information Management System (C)
 
-基于C语言开发的学生信息管理系统，提供学生信息的增删改查、排序和文件存储功能。
+> [中文](./README.zh.md)
 
-## 项目结构
+A student information management system developed in C, providing CRUD operations, sorting, and file persistence.
+
+## Project Structure
 
 ```
 student-management-system/
-├── include/          # 头文件目录
-│   └── mylist.h      # 链表数据结构和函数声明
-├── src/              # 源代码目录
-│   ├── student.c     # 主程序和业务逻辑
-│   └── mylist.c      # 链表操作实现
-├── build/            # 编译输出目录
-├── docs/             # 文档目录
-├── tests/            # 测试文件目录
-├── Makefile          # 构建脚本
-└── README.md         # 项目说明
+├── include/          # Header files
+│   └── mylist.h      # Single-file header library (STB style): declarations + implementation
+├── src/              # Source code
+│   └── student.c     # Main program and business logic
+├── build/            # Build output
+├── docs/             # Documentation
+├── tests/            # Tests
+├── Makefile          # Build script
+└── README.md         # Project readme
 ```
 
-## 功能特性
+## STB Style
 
-- 用户登录系统
-- 添加学生信息（学号、姓名、性别、年龄、数学成绩、英语成绩）
-- 查询学生信息（按学号/姓名）
-- 修改学生信息
-- 删除学生信息
-- 按多种方式排序（学号、数学成绩、英语成绩、总分）
-- 数据持久化存储（student.txt）
+This project adopts the [stb](https://github.com/nothings/stb) single-file header library design:
 
-## 编译和运行
+- **`include/mylist.h`** is a self-contained single-file library with full declarations and implementation
+- **By default**, it only exposes declarations without generating implementation code
+- **In exactly one `.c` file**, define `MYLIST_IMPLEMENTATION` before including the header to generate the implementation:
+
+```c
+#define MYLIST_IMPLEMENTATION
+#include "mylist.h"
+```
+
+## Features
+
+- User login system
+- Add student info (ID, name, gender, age, math score, English score)
+- Query student info (by ID / by name)
+- Modify student info
+- Delete student info
+- Sort by multiple fields (ID, math score, English score, total score)
+- Data persistence (student.txt)
+
+## Build & Run
 
 ```bash
-# 编译项目
+# Build
 make
 
-# 运行程序
+# Run
 make run
 
-# 清理构建文件
+# Clean
 make clean
 
-# 安装到系统
+# Install to system
 make install
 
-# 从系统卸载
+# Uninstall from system
 make uninstall
 ```
 
-## 系统要求
+## Requirements
 
-- GCC 编译器
-- POSIX 兼容系统（Linux/macOS）
+- GCC compiler
+- POSIX-compatible system (Linux / macOS)
 
-
-## 许可证
+## License
 
 MIT License

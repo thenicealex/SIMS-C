@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#define MYLIST_IMPLEMENTATION
 #include "mylist.h"
 
 #ifdef _WIN32
